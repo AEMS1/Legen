@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Legend Token Platform</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Legend Token (LGD)</h1>
+    <p>Total Supply: 990,000,000 LGD</p>
+    <p>Network: BNB Chain</p>
+    <button id="connectWallet">Connect Wallet</button>
+  </header>  <section id="token-info">
+    <h2>About Legend Token</h2>
+    <p>Legend (LGD) is a utility token powering a decentralized platform with gaming, staking, and reward-based features. With a limited supply and engaging mechanics, LGD provides users opportunities to earn, compete, and participate in an exciting blockchain ecosystem.</p>
+  </section>  <section id="price-tracker">
+    <h2>Live Token Price</h2>
+    <div id="livePrice">Loading...</div>
+  </section>  <section id="exchange">
+    <h2>Buy / Sell LGD</h2>
+    <input type="number" id="tradeAmount" placeholder="Amount in LGD" />
+    <select id="tradeType">
+      <option value="buy">Buy</option>
+      <option value="sell">Sell</option>
+    </select>
+    <button id="executeTrade">Execute</button>
+    <p>1% fee applies and goes to the token owner's wallet.</p>
+  </section>  <section id="betting">
+    <h2>Price Prediction Game</h2>
+    <p>Select a token and multiplier, then predict price movement.</p>
+    <select id="tokenSelect">
+      <option value="btc">Bitcoin</option>
+      <option value="eth">Ethereum</option>
+      <option value="bnb">BNB</option>
+      <option value="lgd">Legend</option>
+    </select>
+    <select id="multiplier">
+      <option value="1">x1 (10,000 LGD)</option>
+      <option value="2">x2 (15,000 LGD)</option>
+      <option value="3">x3 (20,000 LGD)</option>
+      <option value="4">x4 (25,000 LGD)</option>
+      <option value="5">x5 (30,000 LGD)</option>
+    </select>
+    <button id="enterBet">Enter Prediction</button>
+    <div id="countdown">Event ends in: <span id="timer">Loading...</span></div>
+  </section>  <section id="leaderboard">
+    <h2>Top Players</h2>
+    <ol id="topPlayers"></ol>
+  </section>  <section id="adminPanel" style="display:none;">
+    <h2>Admin Panel</h2>
+    <p>Welcome, Owner. Here you can adjust game settings, distribute rewards, and manage liquidity.</p>
+  </section>  <footer>
+    <p>© 2025 Legend Token. All rights reserved.</p>
+  </footer>
+</body>
+</html>
