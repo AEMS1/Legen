@@ -1,58 +1,66 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Legend Token Platform</title>
-  <link rel="stylesheet" href="style.css" />
-  <script defer src="app.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legend Token (LGD)</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background-color: #0e0e0e; color: white; }
+    button { padding: 10px 15px; background: #ffb300; border: none; border-radius: 5px; cursor: pointer; }
+    #admin-panel { display: none; margin-top: 20px; padding: 10px; background: #222; border-radius: 10px; }
+  </style>
 </head>
-<body>
-  <header>
-    <h1>Legend Token (LGD)</h1>
-    <p>Total Supply: 990,000,000 LGD</p>
-    <p>Network: BNB Chain</p>
-    <button id="connectWallet">Connect Wallet</button>
-  </header>  <section id="token-info">
-    <h2>About Legend Token</h2>
-    <p>Legend (LGD) is a utility token powering a decentralized platform with gaming, staking, and reward-based features. With a limited supply and engaging mechanics, LGD provides users opportunities to earn, compete, and participate in an exciting blockchain ecosystem.</p>
-  </section>  <section id="price-tracker">
-    <h2>Live Token Price</h2>
-    <div id="livePrice">Loading...</div>
-  </section>  <section id="exchange">
-    <h2>Buy / Sell LGD</h2>
-    <input type="number" id="tradeAmount" placeholder="Amount in LGD" />
-    <select id="tradeType">
-      <option value="buy">Buy</option>
-      <option value="sell">Sell</option>
-    </select>
-    <button id="executeTrade">Execute</button>
-    <p>1% fee applies and goes to the token owner's wallet.</p>
-  </section>  <section id="betting">
-    <h2>Price Prediction Game</h2>
-    <p>Select a token and multiplier, then predict price movement.</p>
-    <select id="tokenSelect">
-      <option value="btc">Bitcoin</option>
-      <option value="eth">Ethereum</option>
-      <option value="bnb">BNB</option>
-      <option value="lgd">Legend</option>
-    </select>
-    <select id="multiplier">
-      <option value="1">x1 (10,000 LGD)</option>
-      <option value="2">x2 (15,000 LGD)</option>
-      <option value="3">x3 (20,000 LGD)</option>
-      <option value="4">x4 (25,000 LGD)</option>
-      <option value="5">x5 (30,000 LGD)</option>
-    </select>
-    <button id="enterBet">Enter Prediction</button>
-    <div id="countdown">Event ends in: <span id="timer">Loading...</span></div>
-  </section>  <section id="leaderboard">
-    <h2>Top Players</h2>
-    <ol id="topPlayers"></ol>
-  </section>  <section id="adminPanel" style="display:none;">
-    <h2>Admin Panel</h2>
-    <p>Welcome, Owner. Here you can adjust game settings, distribute rewards, and manage liquidity.</p>
-  </section>  <footer>
-    <p>© 2025 Legend Token. All rights reserved.</p>
-  </footer>
-</body>
+<body><h1>Welcome to the Official Site of Legend Token (LGD)</h1><!-- Wallet Connection --><button onclick="connectWallet()">Connect Wallet</button>
+
+<p id="wallet-address"></p><!-- Admin Panel (only visible to owner) --><div id="admin-panel">
+  <h2>Admin Panel</h2>
+  <p>You are connected as the owner.</p>
+  <!-- You can add management features here -->
+</div><!-- Token Information --><section id="token-info">
+  <h2>Token Details</h2>
+  <p><strong>Name:</strong> Legend</p>
+  <p><strong>Symbol:</strong> LGD</p>
+  <p><strong>Total Supply:</strong> 990,000,000</p>
+  <p><strong>Contract Address:</strong> 0x4751C0DE56EFB3770615097347cbF131D302498A</p>
+</section><!-- Buy Token --><section>
+  <h2>Buy LGD Token</h2>
+  <a href="https://pancakeswap.finance/swap?outputCurrency=0x4751C0DE56EFB3770615097347cbF131D302498A" target="_blank">
+    Buy on PancakeSwap
+  </a>
+</section><!-- Live Price Feed --><section>
+  <h2>Live Prices</h2>
+  <p id="lgd-price">Loading token prices...</p>
+</section><script>
+async function connectWallet() {
+  if (window.ethereum) {
+    try {
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      const walletAddress = accounts[0];
+      document.getElementById("wallet-address").innerText = "Wallet: " + walletAddress;
+
+      const owner = "0xec54951C7d4619256Ea01C811fFdFa01A9925683";
+      if (walletAddress.toLowerCase() === owner.toLowerCase()) {
+        document.getElementById("admin-panel").style.display = "block";
+      }
+    } catch (err) {
+      alert("Failed to connect wallet: " + err.message);
+    }
+  } else {
+    alert("Please install MetaMask to connect your wallet.");
+  }
+}
+
+// Load token prices
+fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin&vs_currencies=usd")
+  .then(response => response.json())
+  .then(data => {
+    const btc = data.bitcoin.usd;
+    const eth = data.ethereum.usd;
+    const bnb = data.binancecoin.usd;
+    document.getElementById("lgd-price").innerText = BTC: $${btc} | ETH: $${eth} | BNB: $${bnb};
+  })
+  .catch(() => {
+    document.getElementById("lgd-price").innerText = "Failed to load price data.";
+  });
+</script></body>
 </html>
