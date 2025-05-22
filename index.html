@@ -1,117 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Legend Token Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Legend Token DApp</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 </head>
 <body>
-  <!-- بخش معرفی توکن -->
-  <section id="token-info">
+  <!-- معرفی توکن -->
+  <section id="intro">
     <h1>Legend Token (LGD)</h1>
-    <p>Total Supply: 990,000,000 LGD</p>
-    <p>Contract: <code>0x4751C0DE56EFB3770615097347cbF131D302498A</code></p>
-    <img src="logo.png" alt="Legend Token Logo" width="100" />
-  </section>
-
-  <!-- اتصال کیف پول -->
-  <section id="wallet-connect">
-    <button onclick="connectWallet()">Connect Wallet</button>
-    <p id="wallet-address"></p>
-  </section>
-
-  <!-- خرید و فروش توکن -->
-  <section id="token-swap">
-    <h2>Buy / Sell LGD Token</h2>
-    <iframe src="https://pancakeswap.finance/swap?outputCurrency=0x4751C0DE56EFB3770615097347cbF131D302498A" width="100%" height="400" style="border:none;"></iframe>
-  </section>
-
-  <!-- بخش شرط بندی -->
-  <section id="bet-section">
-    <h2>Prediction Market</h2>
-    <p>Choose a token and predict whether its price will go UP or DOWN in the next 5 minutes</p>
-
-    <form id="bet-form">
-      <label>Choose Token:</label>
-      <select name="token">
-        <option value="BTCUSDT">Bitcoin (BTC)</option>
-        <option value="ETHUSDT">Ethereum (ETH)</option>
-        <option value="BNBUSDT">Binance Coin (BNB)</option>
-        <option value="LGD">Legend Token (LGD)</option>
-      </select>
-
-      <label>Select Multiplier:</label>
-      <select name="multiplier">
-        <option value="1">x1 - Min: 10,000 LGD</option>
-        <option value="2">x2 - Min: 15,000 LGD</option>
-        <option value="3">x3 - Min: 20,000 LGD</option>
-        <option value="4">x4 - Min: 25,000 LGD</option>
-        <option value="5">x5 - Min: 30,000 LGD</option>
-      </select>
-
-      <label>Direction:</label>
-      <select name="direction">
-        <option value="up">Up</option>
-        <option value="down">Down</option>
-      </select>
-
-      <button type="submit">Place Bet</button>
-    </form>
-
-    <!-- نمایش نمودار کندل -->
-    <div id="chart">
-      <h3>Live Chart</h3>
-      <div id="tradingview-widget-container" style="height: 400px;"></div>
+    <p>قرارداد: <span id="contractAddress">0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842</span></p>
+    <p>شبکه: Binance Smart Chain</p>
+    <p>نماد: LGD</p>
+  </section>  <!-- اتصال کیف پول -->  <section id="wallet">
+    <h2>اتصال کیف پول</h2>
+    <button onclick="connectWallet()">اتصال کیف پول</button>
+    <p id="walletAddress">کیف پول متصل نشده</p>
+  </section>  <!-- خرید و فروش توکن -->  <section id="swap">
+    <h2>خرید و فروش توکن</h2>
+    <p>خرید از پنکیک‌سوآپ با 1٪ کارمزد به مالک</p>
+    <input type="number" id="amountToBuy" placeholder="مقدار BNB برای خرید" />
+    <button onclick="buyToken()">خرید LGD</button>
+    <input type="number" id="amountToSell" placeholder="مقدار LGD برای فروش" />
+    <button onclick="sellToken()">فروش LGD</button>
+  </section>  <!-- نرخ زنده توکن -->  <section id="live-price">
+    <h2>نرخ زنده</h2>
+    <div id="tokenPrices">
+      <p>BTC: <span id="btcPrice"></span></p>
+      <p>ETH: <span id="ethPrice"></span></p>
+      <p>BNB: <span id="bnbPrice"></span></p>
+      <p>LGD: <span id="lgdPrice"></span></p>
     </div>
+  </section>  <!-- شرط بندی -->  <section id="bet">
+    <h2>شرط بندی روی توکن‌ها</h2>
+    <select id="tokenToBet">
+      <option value="BTC">BTC</option>
+      <option value="ETH">ETH</option>
+      <option value="BNB">BNB</option>
+      <option value="LGD">LGD</option>
+    </select>
+    <label>مضرب ورود:</label>
+    <select id="multiplier">
+      <option value="1">1 (10000 LGD)</option>
+      <option value="2">2 (15000 LGD)</option>
+      <option value="3">3 (20000 LGD)</option>
+      <option value="4">4 (25000 LGD)</option>
+      <option value="5">5 (30000 LGD)</option>
+    </select>
+    <p>پیش‌بینی:</p>
+    <button onclick="placeBet('up')">بالا می‌رود</button>
+    <button onclick="placeBet('down')">پایین می‌آید</button>
+  </section>  <!-- لیست افراد برتر -->  <section id="leaderboard">
+    <h2>10 کاربر برتر</h2>
+    <ul id="topUsers"></ul>
+    <p>زمان باقی مانده تا پایان رویداد: <span id="countdown">3 روز</span></p>
+  </section>  <!-- پنل مدیریت -->  <section id="admin" style="display:none;">
+    <h2>پنل مدیریت</h2>
+    <p>امکان مشاهده لیست کاربران، امتیازات، و کنترل جایزه</p>
+  </section>  <script src="script.js"></script></body>
+  <section id="leaderboard" class="section">
+    <h2>جدول رتبه‌بندی کاربران</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>رتبه</th>
+          <th>آدرس کیف پول</th>
+          <th>امتیاز</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboardBody">
+        <!-- داده‌ها به‌صورت داینامیک وارد می‌شوند -->
+      </tbody>
+    </table>
   </section>
-
-  <!-- رتبه بندی -->
-  <section id="leaderboard">
-    <h2>Top 10 Users</h2>
-    <ul id="leaderboard-list">
-      <li>Loading leaderboard...</li>
-    </ul>
-    <p id="countdown">Event ends in: 3 days</p>
-  </section>
-
-  <!-- پنل مدیریت (فقط برای مالک) -->
-  <section id="admin-panel" style="display:none;">
-    <h2>Admin Panel</h2>
-    <p>Total collected LGD: <span id="admin-balance">0</span></p>
-    <button onclick="withdraw()">Withdraw Earnings</button>
-  </section>
-
-  <script src="main.js"></script>
-
-  <!-- TradingView Widget Script -->
-  <script type="text/javascript">
-    function loadChart(symbol = 'BTCUSDT') {
-      document.getElementById('tradingview-widget-container').innerHTML = '';
-      new TradingView.widget({
-        "width": "100%",
-        "height": 400,
-        "symbol": "BINANCE:" + symbol,
-        "interval": "1",
-        "timezone": "Etc/UTC",
-        "theme": "light",
-        "style": "1",
-        "locale": "en",
-        "toolbar_bg": "#f1f3f6",
-        "enable_publishing": false,
-        "container_id": "tradingview-widget-container"
-      });
-    }
-
-    // بارگذاری اولیه نمودار
-    loadChart();
-    document.querySelector('[name="token"]').addEventListener('change', (e) => {
-      const selected = e.target.value;
-      loadChart(selected === 'LGD' ? 'BTCUSDT' : selected); // برای LGD پیش‌فرض
-    });
-  </script>
-
-  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-</body>
 </html>
