@@ -77,13 +77,13 @@ async function placeBet() {
 
 // برای نمایش نرخ زنده (نمونه ساده با قیمت جعلی)
 async function updatePrices() {
-  document.getElementById("btcPrice").innerText = "BTC: $67,000";
-  document.getElementById("ethPrice").innerText = "ETH: $3,100";
-  document.getElementById("bnbPrice").innerText = "BNB: $600";
-  document.getElementById("legendPrice").innerText = "LGD: $0.05";
+  document.getElementById("btcPrice").innerText = ;
+  document.getElementById("ethPrice").innerText = ;
+  document.getElementById("bnbPrice").innerText = ;
+  document.getElementById("legendPrice").innerText = "LGD: $0.02;
 }
 
-setInterval(updatePrices, 5000); // بروزرسانی هر 30 ثانیه
+setInterval(updatePrices, 5000); // بروزرسانی هر 5 ثانیه
 
 window.addEventListener('load', () => {
   updatePrices();
