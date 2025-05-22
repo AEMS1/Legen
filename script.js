@@ -83,7 +83,7 @@ async function updatePrices() {
   document.getElementById("legendPrice").innerText = "LGD: $0.05";
 }
 
-setInterval(updatePrices, 30000); // بروزرسانی هر 30 ثانیه
+setInterval(updatePrices, 5000); // بروزرسانی هر 30 ثانیه
 
 window.addEventListener('load', () => {
   updatePrices();
