@@ -2,150 +2,72 @@
 <html lang="fa">
 <head>
   <meta charset="UTF-8">
-  <title>Legend Token Platform</title>
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-  <style>
-    body { font-family: sans-serif; background: #111; color: #fff; padding: 20px; direction: rtl; }
-    .section { border: 1px solid #444; padding: 20px; margin-bottom: 20px; border-radius: 10px; background: #222; }
-    button { padding: 10px 15px; margin-top: 10px; background: #28a745; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
-    input, select { padding: 8px; margin-top: 10px; width: 100%; border-radius: 6px; }
-    h2 { color: #ffd700; }
-  </style>
+  <title>Legend Token DApp</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- معرفی توکن -->
   <div class="section">
-    <h2>معرفی توکن LEGEND</h2>
-    <p>توکن LEGEND با قرارداد: <code>0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842</code></p>
-    <p>حداکثر عرضه: 1,000,000,000</p>
-    <p>قابل معامله در شبکه BSC با قابلیت شرط بندی و خرید/فروش درون سایتی</p>
+    <h1>معرفی توکن LGD</h1>
+    <p>توکن رسمی پلتفرم شرط‌بندی غیرمتمرکز. نام: <b>Legend</b> | نماد: <b>LGD</b></p>
   </div>
 
-  <!-- اتصال کیف پول -->
   <div class="section">
     <h2>اتصال کیف پول</h2>
-    <button onclick="connectWallet()">اتصال متامسک</button>
-    <p id="wallet-status">کیف پول متصل نشده</p>
+    <button onclick="connectWallet()">اتصال به کیف پول</button>
+    <p id="walletAddress">آدرس کیف پول: متصل نشده</p>
   </div>
 
-  <!-- خرید توکن -->
   <div class="section">
-    <h2>خرید توکن LEGEND</h2>
-    <input type="number" id="buyAmount" placeholder="مقدار خرید (LEGEND)">
-    <button onclick="buyToken()">خرید با کسر ۱٪ کارمزد</button>
+    <h2>خرید و فروش توکن LGD</h2>
+    <p>مقدار کارمزد هر معامله: 1% (واریز به کیف پول مالک)</p>
+    <input type="number" id="buyAmount" placeholder="مقدار برای خرید LGD">
+    <button onclick="buyToken()">خرید LGD</button>
+    <input type="number" id="sellAmount" placeholder="مقدار برای فروش LGD">
+    <button onclick="sellToken()">فروش LGD</button>
+    <p id="priceLive">نرخ زنده LGD: ...</p>
   </div>
 
-  <!-- شرط بندی -->
   <div class="section">
-    <h2>بازی روی رمزارزها</h2>
-    <label>انتخاب رمزارز:</label>
+    <h2>شرط‌بندی روی توکن‌ها</h2>
     <select id="tokenSelect">
-      <option value="bitcoin">Bitcoin</option>
-      <option value="ethereum">Ethereum</option>
-      <option value="bnb">BNB</option>
-      <option value="legend">LEGEND</option>
+      <option value="BTC">بیت‌کوین</option>
+      <option value="ETH">اتریوم</option>
+      <option value="BNB">بایننس</option>
+      <option value="LGD">لجند</option>
     </select>
-    <input type="number" id="betAmount" placeholder="مقدار توکن LEGEND برای بازی (حداقل 10)">
-    <label>پیش بینی شما:</label>
-    <select id="betDirection">
-      <option value="up">بالا می‌رود</option>
-      <option value="down">پایین می‌آید</option>
+    
+    <select id="multiplier">
+      <option value="1">مضرب 1 (10000 LGD)</option>
+      <option value="2">مضرب 2 (15000 LGD)</option>
+      <option value="3">مضرب 3 (20000 LGD)</option>
+      <option value="4">مضرب 4 (25000 LGD)</option>
+      <option value="5">مضرب 5 (30000 LGD)</option>
     </select>
-    <button onclick="placeBet()">ثبت بازی</button>
-    <p id="betResult"></p>
+
+    <label>پیش‌بینی شما:</label><br>
+    <input type="radio" name="direction" value="up"> بالا رفتن
+    <input type="radio" name="direction" value="down"> پایین آمدن
+    <br>
+    <button onclick="placeBet()">ثبت شرط</button>
+    <p>نتیجه شرط شما بعد از 1 دقیقه مشخص می‌شود.</p>
   </div>
 
-  <!-- لیست افراد برتر -->
   <div class="section">
     <h2>رتبه‌بندی کاربران</h2>
     <ul id="leaderboard">
-      <li>کاربر A - امتیاز: 120</li>
-      <li>کاربر B - امتیاز: 110</li>
-      <li>کاربر C - امتیاز: 95</li>
+      <li>کاربر A - امتیاز: 200</li>
+      <li>کاربر B - امتیاز: 150</li>
+      <li>کاربر C - امتیاز: 100</li>
     </ul>
+    <p>زمان باقی‌مانده تا بروزرسانی رتبه‌ها: <span id="countdown">3 روز</span></p>
   </div>
 
-  <!-- اسکریپت اصلی -->
-  <script>
-    const tokenAddress = "0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842";
-    const ownerWallet = "0xYourWalletAddressHere";
-    const tokenABI = [
-      {
-        "inputs": [
-          { "internalType": "address", "name": "recipient", "type": "address" },
-          { "internalType": "uint256", "name": "amount", "type": "uint256" }
-        ],
-        "name": "transfer",
-        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          { "internalType": "address", "name": "sender", "type": "address" },
-          { "internalType": "address", "name": "recipient", "type": "address" },
-          { "internalType": "uint256", "name": "amount", "type": "uint256" }
-        ],
-        "name": "transferFrom",
-        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      }
-    ];
+  <div class="section" id="adminPanel" style="display: none;">
+    <h2>پنل مدیریت (فقط برای مالک)</h2>
+    <p>اینجا فقط زمانی نمایش داده می‌شود که مالک توکن متصل شود.</p>
+  </div>
 
-    let web3;
-    let account;
-
-    async function connectWallet() {
-      if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const accounts = await web3.eth.getAccounts();
-        account = accounts[0];
-        document.getElementById("wallet-status").innerText = متصل شد: ${account};
-      } else {
-        alert("لطفاً MetaMask را نصب کنید.");
-      }
-    }
-
-    async function buyToken() {
-      const amount = document.getElementById("buyAmount").value;
-      if (!amount || amount <= 0) return alert("مقدار معتبر وارد کنید");
-
-      const contract = new web3.eth.Contract(tokenABI, tokenAddress);
-      const decimals = 18;
-      const fullAmount = BigInt(amount * 10 ** decimals);
-      const fee = fullAmount / 100n;
-      const finalAmount = fullAmount - fee;
-
-      try {
-        await contract.methods.transferFrom(account, ownerWallet, fee.toString()).send({ from: account });
-        await contract.methods.transferFrom(account, account, finalAmount.toString()).send({ from: account });
-        alert("خرید موفقیت‌آمیز بود.");
-      } catch (err) {
-        console.error(err);
-        alert("تراکنش ناموفق بود.");
-      }
-    }
-
-    function placeBet() {
-      const amount = Number(document.getElementById("betAmount").value);
-      const direction = document.getElementById("betDirection").value;
-      if (amount < 10) return alert("حداقل مقدار برای بازی بندی 10 توکن است");
-
-      const result = Math.random() < 0.5 ? "up" : "down";
-      const isWin = result === direction;
-
-      setTimeout(() => {
-        if (isWin) {
-          document.getElementById("betResult").innerText = "شما برنده شدید! امتیاز دریافت شد.";
-        } else {
-          document.getElementById("betResult").innerText = "باختید! توکن‌ها کسر شد.";
-        }
-      }, 60000);
-    }
-  </script>
-
+  <script src="script.js"></script>
 </body>
 </html>
