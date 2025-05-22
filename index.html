@@ -1,66 +1,77 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Legend Token DApp</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Legend Token Platform</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
 </head>
-<body>  <!-- Navbar -->  <header>
-    <h1>Legend (LGD) - Decentralized Platform</h1>
+<body>
+  <header>
+    <h1>Legend Token Platform</h1>
     <button id="connectWallet">Connect Wallet</button>
-  </header>  <!-- Section 1: Token Introduction -->  <section id="about">
-    <h2>About Legend (LGD)</h2>
-    <p>Legend (LGD) is a revolutionary utility token built on the BNB Smart Chain, enabling community-powered gaming, prediction markets, and real use cases in a fully decentralized ecosystem.</p>
-    <p>Total Supply: 990,000,000</p>
-    <p>Token Contract: 0x4751C0DE56EFB3770615097347cbF131D302498A</p>
-  </section>  <!-- Section 2: Token Live Price -->  <section id="live-price">
-    <h2>Live Prices</h2>
-    <div id="price-list">
-      <!-- Live token prices will be loaded here -->
-    </div>
-  </section>  <!-- Section 3: Buy / Sell -->  <section id="exchange">
-    <h2>Buy / Sell Legend (LGD)</h2>
-    <p>Buy and sell using PancakeSwap via this interface. 1% fee is sent to the owner wallet.</p>
-    <button id="buyToken">Buy LGD</button>
-    <button id="sellToken">Sell LGD</button>
-  </section>  <!-- Section 4: Betting -->  <section id="betting">
-    <h2>Prediction Market</h2>
-    <form id="betForm">
-      <label for="token">Choose Token:</label>
-      <select id="token" required>
-        <option value="BTC">Bitcoin</option>
-        <option value="ETH">Ethereum</option>
-        <option value="BNB">BNB</option>
-        <option value="LGD">Legend (LGD)</option>
-      </select><label for="direction">Direction:</label>
-  <select id="direction" required>
-    <option value="up">Up</option>
-    <option value="down">Down</option>
-  </select>
+    <span id="walletAddress"></span>
+  </header>
 
-  <label for="multiplier">Choose Multiplier (1-5):</label>
-  <select id="multiplier" required>
-    <option value="1">1x (Min 10,000 LGD)</option>
-    <option value="2">2x (Min 15,000 LGD)</option>
-    <option value="3">3x (Min 20,000 LGD)</option>
-    <option value="4">4x (Min 25,000 LGD)</option>
-    <option value="5">5x (Min 30,000 LGD)</option>
-  </select>
+  <main>
+    <section id="tokenInfo">
+      <h2>About LGD</h2>
+      <p>Legend Token (LGD) is a utility token built on BNB Chain designed to offer secure, decentralized access to a fun prediction platform with real rewards and ranking. Holders can trade, stake, and engage in prediction games.</p>
+    </section>
 
-  <button type="submit">Enter Prediction</button>
-</form>
+    <section id="buySell">
+      <h2>Buy / Sell LGD</h2>
+      <p>Use PancakeSwap to trade LGD. A 1% fee goes to the owner wallet.</p>
+      <a href="https://pancakeswap.finance/swap?outputCurrency=0x4751C0DE56EFB3770615097347cbF131D302498A" target="_blank">Trade on PancakeSwap</a>
+      <div id="lgdPrice">Current LGD Price: Loading...</div>
+    </section>
 
-  </section>  <!-- Section 5: Leaderboard -->  <section id="leaderboard">
-    <h2>Top Users</h2>
-    <p>Updated every 5 days. Top 10 scorers shown. Winner receives 5M LGD.</p>
-    <div id="timer">Time left: 3 days</div>
-    <ul id="topUsersList">
-      <!-- Top users will be listed here -->
-    </ul>
-  </section>  <!-- Section 6: Owner Panel -->  <section id="adminPanel" style="display: none;">
-    <h2>Admin Panel</h2>
-    <p>Only visible when owner's wallet is connected.</p>
-    <button id="withdrawFees">Withdraw Fees</button>
-    <button id="distributeRewards">Distribute Leaderboard Rewards</button>
-  </section>  <script src="script.js"></script></body>
+    <section id="prediction">
+      <h2>Prediction Game</h2>
+      <label for="tokenSelect">Choose token:</label>
+      <select id="tokenSelect">
+        <option value="bitcoin">Bitcoin</option>
+        <option value="ethereum">Ethereum</option>
+        <option value="binancecoin">BNB</option>
+        <option value="legend">LGD</option>
+      </select>
+
+      <label for="multiplier">Select Multiplier:</label>
+      <select id="multiplier">
+        <option value="1">x1 (min 10000 LGD)</option>
+        <option value="2">x2 (min 15000 LGD)</option>
+        <option value="3">x3 (min 20000 LGD)</option>
+        <option value="4">x4 (min 25000 LGD)</option>
+        <option value="5">x5 (min 30000 LGD)</option>
+      </select>
+
+      <label for="direction">Prediction:</label>
+      <select id="direction">
+        <option value="up">Price Up</option>
+        <option value="down">Price Down</option>
+      </select>
+
+      <button id="placeBet">Place Prediction</button>
+      <div id="betStatus"></div>
+    </section>
+
+    <section id="leaderboard">
+      <h2>Top Players</h2>
+      <ul id="topPlayers">
+        <li>Loading...</li>
+      </ul>
+      <p id="countdown">Next reward in: 3 days</p>
+    </section>
+
+    <section id="adminPanel" style="display:none;">
+      <h2>Admin Panel</h2>
+      <p>Welcome, owner! Manage platform settings here.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Legend Token. All rights reserved.</p>
+  </footer>
+</body>
 </html>
