@@ -1,43 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Legend Token Platform</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- 1. Token Introduction -->
   <header>
-    <h1>Welcome to Legend (LGD)</h1>
-    <p>Legend (LGD) is a powerful token designed for prediction markets, gaming, and DeFi transactions.</p>
+    <h1>Welcome to the LGD Platform</h1>
+    <p>The decentralized prediction and trading platform using LGD token.</p>
   </header>
 
-  <!-- 2. Wallet Connection -->
-  <section id="wallet-connection">
+  <!-- Wallet -->
+  <section>
     <h2>Connect Your Wallet</h2>
-    <button id="connectWalletBtn">Connect with MetaMask</button>
-    <p id="walletAddress"></p>
+    <button id="connectWalletBtn">Connect MetaMask</button>
+    <p id="walletAddress">Wallet not connected</p>
   </section>
 
-  <!-- 3. Buy / Sell LGD Token -->
-  <section id="trade">
-    <h2>Buy / Sell LGD</h2>
-    <label for="tradeType">Type:</label>
-    <select id="tradeType">
-      <option value="buy">Buy</option>
-      <option value="sell">Sell</option>
-    </select>
-
-    <label for="tradeAmount">Amount:</label>
-    <input type="number" id="tradeAmount" min="1">
-
-    <button id="tradeButton">Execute Trade (1% fee)</button>
-    <p id="tradeMessage"></p>
-  </section>
-
-  <!-- 4. Live Token Prices -->
-  <section id="live-prices">
+  <!-- Live Prices -->
+  <section>
     <h2>Live Token Prices</h2>
     <ul>
       <li>BTC: <span id="priceBTC">Loading...</span></li>
@@ -45,54 +28,87 @@
       <li>BNB: <span id="priceBNB">Loading...</span></li>
       <li>LGD: <span id="priceLGD">Loading...</span></li>
     </ul>
+    <div id="candlestickChart"></div>
   </section>
 
-  <!-- 5. Prediction Game -->
-  <section id="prediction">
-    <h2>Token Prediction</h2>
+  <!-- Buy/Sell -->
+  <section>
+    <h2>Buy / Sell LGD</h2>
+    <select id="tradeType">
+      <option value="buy">Buy</option>
+      <option value="sell">Sell</option>
+    </select>
+    <input type="number" id="tradeAmount" placeholder="Amount" min="1"/>
+    <button id="tradeBtn">Trade (1% fee)</button>
+    <p id="tradeMessage"></p>
+  </section>
+
+  <!-- Prediction Game -->
+  <section>
+    <h2>Prediction Betting</h2>
     <form id="betForm">
-      <label for="token">Select Token:</label>
-      <select id="token" required>
-        <option value="BTC">Bitcoin (BTC)</option>
-        <option value="ETH">Ethereum (ETH)</option>
-        <option value="BNB">Binance Coin (BNB)</option>
-        <option value="LGD">Legend (LGD)</option>
+      <label for="token">Choose Token:</label>
+      <select id="token">
+        <option value="BTC">BTC</option>
+        <option value="ETH">ETH</option>
+        <option value="BNB">BNB</option>
+        <option value="LGD">LGD</option>
       </select>
 
       <label for="direction">Prediction:</label>
-      <select id="direction" required>
-        <option value="up">Will Go Up</option>
-        <option value="down">Will Go Down</option>
+      <select id="direction">
+        <option value="up">Will go UP</option>
+        <option value="down">Will go DOWN</option>
       </select>
 
-      <label for="amount">Amount (Min: 10 LGD):</label>
-      <input type="number" id="amount" min="10" required>
+      <label for="multiplier">Multiplier:</label>
+      <select id="multiplier" onchange="updateMinAmount()">
+        <option value="1">1x - Min 10,000 LGD</option>
+        <option value="2">2x - Min 20,000 LGD</option>
+        <option value="3">3x - Min 30,000 LGD</option>
+        <option value="4">4x - Min 40,000 LGD</option>
+        <option value="5">5x - Min 50,000 LGD</option>
+      </select>
+
+      <label for="betAmount">Amount (LGD):</label>
+      <input type="number" id="betAmount" min="10000" required/>
 
       <button type="submit">Place Bet</button>
     </form>
-
-    <p id="predictionMessage"></p>
+    <p id="betMessage"></p>
   </section>
 
-  <!-- 6. Leaderboard -->
-  <section id="leaderboard">
+  <!-- Leaderboard -->
+  <section>
     <h2>Top Players</h2>
     <ul id="leaderboardList">
-      <!-- Dynamically filled -->
+      <!-- Top players will appear here -->
     </ul>
   </section>
 
-  <!-- 7. Admin Panel (Visible only to owner) -->
-  <section id="adminPanel" style="display:none;">
+  <!-- Admin Panel -->
+  <section id="adminPanel" style="display: none;">
     <h2>Admin Panel</h2>
-    <p>You are logged in as the owner.</p>
-    <p>Total LGD Earned from Fees: <span id="ownerEarnings">0</span> LGD</p>
+    <p>You are the owner.</p>
+    <p>Total Fees Collected: <span id="ownerFees">0</span> LGD</p>
   </section>
 
   <footer>
-    <p>Legend Token © 2025</p>
+    <p>© 2025 Legend (LGD) Platform</p>
   </footer>
 
+  <script>
+    function updateMinAmount() {
+      const multiplier = parseInt(document.getElementById("multiplier").value);
+      const minAmount = multiplier * 10000;
+      const input = document.getElementById("betAmount");
+      input.min = minAmount;
+      input.placeholder = Minimum ${minAmount} LGD;
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="app.js"></script>
 </body>
-    </html>
+                                                     </html>
