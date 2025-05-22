@@ -1,100 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Legendary Coin Platform</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legendary Coin</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
-
-  <!-- Connect Wallet -->
   <header>
     <h1>Legendary Coin (LGD)</h1>
     <button onclick="connectWallet()">Connect Wallet</button>
-    <p id="walletAddress"></p>
-  </header>
+  </header>  <section id="intro">
+    <h2>About LGD</h2>
+    <p>LGD is a community-driven token designed for secure, fast, and decentralized transactions with real use cases like staking and betting.</p>
+  </section>  <section id="token-trade">
+    <h2>Buy/Sell LGD</h2>
+    <label for="trade-amount">Amount:</label>
+    <input type="number" id="trade-amount" min="1">
+    <button onclick="buyTokens()">Buy LGD</button>
+    <button onclick="sellTokens()">Sell LGD</button>
+  </section>  <section id="betting">
+    <h2>Short Token Betting</h2>
+    <label for="bet-token">Token to Bet On:</label>
+    <select id="bet-token" onchange="loadTradingViewChart()">
+      <option value="BINANCE:BTCUSDT">BTC</option>
+      <option value="BINANCE:ETHUSDT">ETH</option>
+      <option value="BINANCE:BNBUSDT">BNB</option>
+    </select><label for="multiplier">Multiplier (1-5):</label>
+<select id="multiplier" onchange="autoFillBetAmount()">
+  <option value="1">x1</option>
+  <option value="2">x2</option>
+  <option value="3">x3</option>
+  <option value="4">x4</option>
+  <option value="5">x5</option>
+</select>
 
-  <!-- Token Info -->
-  <section>
-    <h2>Token Information</h2>
-    <ul>
-      <li>Name: Legendary Coin</li>
-      <li>Symbol: LGD</li>
-      <li>Contract: 0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842</li>
-      <li>Total Supply: 1,000,000,000 LGD</li>
-    </ul>
-  </section>
+<label for="bet-direction">Direction:</label>
+<select id="bet-direction">
+  <option value="up">Up</option>
+  <option value="down">Down</option>
+</select>
 
-  <!-- Buy/Sell Token -->
-  <section>
-    <h2>Buy / Sell LGD Token</h2>
-    <input type="number" id="buyAmount" placeholder="Amount in BNB" />
-    <button onclick="buyToken()">Buy LGD</button>
-    <br /><br />
-    <input type="number" id="sellAmount" placeholder="Amount in LGD" />
-    <button onclick="sellToken()">Sell LGD</button>
-  </section>
+<label for="bet-amount">LGD Amount (min 10000):</label>
+<input type="number" id="bet-amount" min="10000">
+<button onclick="placeBet()">Place Bet</button>
 
-  <!-- Live Prices & Chart -->
-  <section>
-    <h2>Live Market</h2>
-    <div id="priceBTC">BTC: Loading...</div>
-    <div id="priceETH">ETH: Loading...</div>
-    <div id="priceBNB">BNB: Loading...</div>
-    <div id="priceLGD">LGD: Loading...</div>
-    <canvas id="chartCanvas" width="400" height="200"></canvas>
-  </section>
+<div id="tradingview_chart" style="height:400px;"></div>
 
-  <!-- Betting -->
-  <section>
-    <h2>Betting</h2>
-    <label>Select Token:</label>
-    <select id="betToken" onchange="updateChart()">
-      <option value="BTC">BTC</option>
-      <option value="ETH">ETH</option>
-      <option value="BNB">BNB</option>
-      <option value="LGD">LGD</option>
-    </select>
-
-    <br/><br/>
-
-    <label>Select Multiplier:</label>
-    <select id="betMultiplier" onchange="autoSetBetAmount()">
-      <option value="1">x1 (10,000 LGD)</option>
-      <option value="2">x2 (25,000 LGD)</option>
-      <option value="3">x3 (50,000 LGD)</option>
-      <option value="4">x4 (75,000 LGD)</option>
-      <option value="5">x5 (100,000 LGD)</option>
-    </select>
-
-    <br/><br/>
-
-    <label>Bet Direction:</label>
-    <select id="betDirection">
-      <option value="up">Up</option>
-      <option value="down">Down</option>
-    </select>
-
-    <br/><br/>
-
-    <input type="number" id="betAmount" readonly />
-    <button onclick="placeBet()">Place Bet</button>
-
-    <div id="betResult"></div>
-  </section>
-
-  <!-- Leaderboard -->
-  <section>
-    <h2>Top Players</h2>
-    <ul id="leaderboard">
-      <li>Loading...</li>
-    </ul>
-  </section>
-
-  <!-- JS -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js"></script>
-
-</body>
+  </section>  <section id="leaderboard">
+    <h2>Top Users</h2>
+    <ul id="leaderboard-list"></ul>
+  </section>  <section id="admin">
+    <h2>Owner Panel</h2>
+    <p>Total Earnings: <span id="total-earnings">0</span> LGD</p>
+    <button onclick="withdrawEarnings()">Withdraw to Owner Wallet</button>
+  </section>  <script src="script.js"></script></body>
 </html>
