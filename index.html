@@ -1,111 +1,77 @@
 <!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Legendary Coin Platform</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial, sans-serif; background-color: #f0f0f0; padding: 20px; }
-    .section { background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; }
-    #adminPanel { display: none; }
-    label { display: block; margin-top: 10px; }
-    select, input { width: 100%; padding: 8px; margin-top: 5px; }
-    button { margin-top: 10px; padding: 10px 20px; }
-    iframe { width: 100%; border: none; height: 400px; margin-top: 20px; }
-  </style>
+  <title>Legend Token Platform</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
-<body>  <div class="section">
-    <h2>About LGD Token</h2>
-    <p><strong>Symbol:</strong> LGD</p>
-    <p><strong>Contract Address:</strong> 0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842</p>
-    <p>Legendary Token (LGD) powers our prediction and trading platform.</p>
+<body>
+  <header>
+    <h1>Legend Token Platform</h1>
+    <p>Buy, Sell, and Bet on Token Prices</p>
     <button onclick="connectWallet()">Connect Wallet</button>
-    <p id="walletAddress"></p>
-  </div>  <div class="section">
-    <h2>Buy / Sell LGD</h2>
-    <label for="tokenAmount">Amount (LGD):</label>
-    <input type="number" id="tokenAmount" placeholder="Enter amount">
-    <button onclick="buyToken()">Buy</button>
-    <button onclick="sellToken()">Sell</button>
-  </div>  <div class="section">
-    <h2>Short Prediction</h2>
-    <label for="tokenSelect">Choose Token:</label>
-    <select id="tokenSelect" onchange="updateChart()">
-      <option value="BINANCE:BTCUSDT">Bitcoin (BTC)</option>
-      <option value="BINANCE:ETHUSDT">Ethereum (ETH)</option>
-      <option value="BINANCE:BNBUSDT">Binance Coin (BNB)</option>
-      <option value="CUSTOM:LGD">Legendary Token (LGD)</option>
-    </select><label for="multiplier">Multiplier:</label>
-<select id="multiplier" onchange="updateRequiredTokens()">
-  <option value="1">1x</option>
-  <option value="2">2x</option>
-  <option value="3">3x</option>
-  <option value="4">4x</option>
-  <option value="5">5x</option>
-</select>
+    <p id="wallet-address"></p>
+  </header>  <main class="container">
+    <!-- 1. Token Info -->
+    <section>
+      <h2>Token Information</h2>
+      <p><strong>Name:</strong> Legend Token</p>
+      <p><strong>Symbol:</strong> LGD</p>
+      <p><strong>Token Address:</strong> 0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842</p>
+      <p><strong>Live Price:</strong> <span id="lgd-price">Loading...</span></p>
+    </section><!-- 2. Short Bet Section -->
+<section>
+  <h2>Short Betting</h2>
+  <label>Select Token:</label>
+  <select id="bet-token" onchange="updateChart()">
+    <option value="BTCUSDT">Bitcoin (BTC)</option>
+    <option value="ETHUSDT">Ethereum (ETH)</option>
+    <option value="BNBUSDT">Binance Coin (BNB)</option>
+    <option value="LGD">Legend Token (LGD)</option>
+  </select>
 
-<p>Required LGD: <span id="requiredTokens">10000</span></p>
-<button onclick="placeBet('up')">Predict Up</button>
-<button onclick="placeBet('down')">Predict Down</button>
+  <div id="chart-container"></div>
 
-<div id="tradingview_chart"></div>
+  <label>Choose Direction:</label>
+  <select id="bet-direction">
+    <option value="up">Price Will Go Up</option>
+    <option value="down">Price Will Go Down</option>
+  </select>
 
-  </div>  <div class="section">
-    <h2>Top Users</h2>
-    <ul id="leaderboard">
-      <li>User1 - 1200 points</li>
-      <li>User2 - 950 points</li>
-    </ul>
-  </div>  <div class="section" id="adminPanel">
-    <h2>Admin Panel</h2>
-    <p>Visible only to contract owner.</p>
-  </div>  <script>
-    let wallet = "";
-    const minBet = 10000;
-    const owner = "0xec54951C7d4619256Ea01C811fFdFa01A9925683";
+  <label>Choose Multiplier:</label>
+  <select id="bet-multiplier" onchange="setAmount()">
+    <option value="1">1x (10,000 LGD)</option>
+    <option value="2">2x (20,000 LGD)</option>
+    <option value="3">3x (30,000 LGD)</option>
+    <option value="4">4x (40,000 LGD)</option>
+    <option value="5">5x (50,000 LGD)</option>
+  </select>
 
-    function connectWallet() {
-      if (typeof window.ethereum !== 'undefined') {
-        window.ethereum.request({ method: 'eth_requestAccounts' }).then(accounts => {
-          wallet = accounts[0];
-          document.getElementById("walletAddress").innerText = "Connected: " + wallet;
-          if (wallet.toLowerCase() === owner.toLowerCase()) {
-            document.getElementById("adminPanel").style.display = "block";
-          }
-        });
-      } else {
-        alert("MetaMask not found");
-      }
-    }
+  <label>Amount (auto-filled):</label>
+  <input type="number" id="bet-amount" readonly>
 
-    function updateRequiredTokens() {
-      const multiplier = parseInt(document.getElementById("multiplier").value);
-      document.getElementById("requiredTokens").innerText = multiplier * minBet;
-    }
+  <button onclick="placeBet()">Place Bet</button>
+  <p id="bet-status"></p>
+</section>
 
-    function updateChart() {
-      const token = document.getElementById("tokenSelect").value;
-      const chartContainer = document.getElementById("tradingview_chart");
-      if (token.startsWith("CUSTOM")) {
-        chartContainer.innerHTML = '<p>No chart available for custom tokens.</p>';
-        return;
-      }
-      chartContainer.innerHTML = `
-        <iframe src="https://s.tradingview.com/widgetembed/?symbol=${token}&interval=1&theme=light&style=1&locale=en" allowfullscreen></iframe>
-      `;
-    }
+<!-- 3. Leaderboard -->
+<section>
+  <h2>Top Users</h2>
+  <ul id="leaderboard" class="top-users"></ul>
+</section>
 
-    function placeBet(direction) {
-      const multiplier = parseInt(document.getElementById("multiplier").value);
-      const required = multiplier * minBet;
-      alert(Placing a ${direction.toUpperCase()} bet with ${required} LGD...);
-    }
+<!-- 4. LGD Trading -->
+<section>
+  <h2>Trade Legend Token</h2>
+  <label>Amount to Buy/Sell:</label>
+  <input type="number" id="trade-amount">
+  <button onclick="buyLGD()">Buy LGD</button>
+  <button onclick="sellLGD()">Sell LGD</button>
+  <p id="trade-status"></p>
+</section>
 
-    function buyToken() {
-      alert("Buying LGD token with 1% fee...");
-    }
-
-    function sellToken() {
-      alert("Selling LGD token with 1% fee...");
-    }
-  </script></body>
+  </main>  <script src="script.js"></script></body>
 </html>
