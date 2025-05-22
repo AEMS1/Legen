@@ -1,72 +1,97 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Legend Token DApp</title>
+  <title>Legendary Coin Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+  <header>
+    <h1>Legendary Coin (LGD)</h1>
+    <button onclick="connectWallet()">Connect Wallet</button>
+    <div id="wallet-address"></div>
+  </header>
 
-  <div class="section">
-    <h1>معرفی توکن LGD</h1>
-    <p>توکن رسمی پلتفرم بازی غیرمتمرکز. نام: <b>Legend</b> | نماد: <b>LGD</b></p>
-  </div>
+  <!-- Token Introduction -->
+  <section>
+    <h2>About LGD Token</h2>
+    <p>Legendary Coin (LGD) is a utility token used for participation, betting, and rewards on this platform.</p>
+  </section>
 
-  <div class="section">
-    <h2>اتصال کیف پول</h2>
-    <button onclick="connectWallet()">اتصال به کیف پول</button>
-    <p id="walletAddress">آدرس کیف پول: متصل نشده</p>
-  </div>
+  <!-- Buy/Sell Section -->
+  <section>
+    <h2>Buy / Sell LGD</h2>
+    <label>Amount:</label>
+    <input type="number" id="tokenAmount" placeholder="Enter amount">
+    <button onclick="buyToken()">Buy</button>
+    <button onclick="sellToken()">Sell</button>
+    <p>*1% fee goes to platform owner</p>
+  </section>
 
-  <div class="section">
-    <h2>خرید و فروش توکن LGD</h2>
-    <p>مقدار کارمزد هر معامله: 1% (واریز به کیف پول مالک)</p>
-    <input type="number" id="buyAmount" placeholder="مقدار برای خرید LGD">
-    <button onclick="buyToken()">خرید LGD</button>
-    <input type="number" id="sellAmount" placeholder="مقدار برای فروش LGD">
-    <button onclick="sellToken()">فروش LGD</button>
-    <p id="priceLive">نرخ زنده LGD: ...</p>
-  </div>
+  <!-- Live Prices -->
+  <section>
+    <h2>Live Token Prices</h2>
+    <div id="live-prices">
+      <p>BTC: <span id="btc-price">Loading...</span></p>
+      <p>ETH: <span id="eth-price">Loading...</span></p>
+      <p>BNB: <span id="bnb-price">Loading...</span></p>
+      <p>LGD: <span id="lgd-price">Loading...</span></p>
+    </div>
+    <canvas id="priceChart" width="400" height="200"></canvas>
+  </section>
 
-  <div class="section">
-    <h2>بازی روی توکن‌ها</h2>
-    <select id="tokenSelect">
-      <option value="BTC">بیت‌کوین</option>
-      <option value="ETH">اتریوم</option>
-      <option value="BNB">بایننس</option>
-      <option value="LGD">لجند</option>
+  <!-- Betting Section -->
+  <section>
+    <h2>Token Betting</h2>
+    <label>Select Token:</label>
+    <select id="selectedToken">
+      <option value="BTC">Bitcoin (BTC)</option>
+      <option value="ETH">Ethereum (ETH)</option>
+      <option value="BNB">Binance Coin (BNB)</option>
+      <option value="LGD">Legendary (LGD)</option>
     </select>
-    
+
+    <label>Choose Direction:</label>
+    <select id="direction">
+      <option value="up">Price Up</option>
+      <option value="down">Price Down</option>
+    </select>
+
+    <label>Multiplier:</label>
     <select id="multiplier">
-      <option value="1">مضرب 1 (10000 LGD)</option>
-      <option value="2">مضرب 2 (15000 LGD)</option>
-      <option value="3">مضرب 3 (20000 LGD)</option>
-      <option value="4">مضرب 4 (25000 LGD)</option>
-      <option value="5">مضرب 5 (30000 LGD)</option>
+      <option value="1">x1 (10,000 LGD)</option>
+      <option value="2">x2 (15,000 LGD)</option>
+      <option value="3">x3 (20,000 LGD)</option>
+      <option value="4">x4 (25,000 LGD)</option>
+      <option value="5">x5 (30,000 LGD)</option>
     </select>
 
-    <label>پیش‌بینی شما:</label><br>
-    <input type="radio" name="direction" value="up"> بالا رفتن
-    <input type="radio" name="direction" value="down"> پایین آمدن
-    <br>
-    <button onclick="placeBet()"> ثبت پیش بینی</button>
-    <p>نتیجه بازی شما بعد از 1 دقیقه مشخص می‌شود.</p>
-  </div>
+    <button onclick="placeBet()">Place Bet</button>
+    <div id="bet-result"></div>
+  </section>
 
-  <div class="section">
-    <h2>رتبه‌بندی کاربران</h2>
-    <ul id="leaderboard">
-      <li>کاربر A - امتیاز: 200</li>
-      <li>کاربر B - امتیاز: 150</li>
-      <li>کاربر C - امتیاز: 100</li>
-    </ul>
-    <p>زمان باقی‌مانده تا بروزرسانی رتبه‌ها: <span id="countdown">3 روز</span></p>
-  </div>
+  <!-- Leaderboard -->
+  <section>
+    <h2>Top Players</h2>
+    <div id="leaderboard">
+      <p>Loading leaderboard...</p>
+    </div>
+    <p>Next reset in: <span id="countdown">Loading...</span></p>
+  </section>
 
-  <div class="section" id="adminPanel" style="display: none;">
-    <h2>پنل مدیریت (فقط برای مالک)</h2>
-    <p>اینجا فقط زمانی نمایش داده می‌شود که مالک توکن متصل شود.</p>
-  </div>
+  <!-- Admin Panel (only visible to owner) -->
+  <section id="admin-panel" style="display: none;">
+    <h2>Admin Panel</h2>
+    <p>Wallet connected as owner.</p>
+    <p>Manage token, bets, and users here (functionality coming in backend).</p>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Legendary Platform. All rights reserved.</p>
+  </footer>
 
   <script src="script.js"></script>
 </body>
