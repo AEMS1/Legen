@@ -1,119 +1,92 @@
-let userAddress = "";
-const contractAddress = "0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842";
-const tokenABI = [  // خلاصه شده فقط برای transfer و transferFrom
-  {
-    "inputs": [{ "internalType": "address", "name": "recipient", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }],
-    "name": "transfer",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "sender", "type": "address" }, { "internalType": "address", "name": "recipient", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }],
-    "name": "transferFrom",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  }
-];
+let userAddress = null;
+const tokenAddress = "0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842";
+const tokenABI = [ /* ABI که قبلاً فرستادید */ ];
+const provider = new ethers.providers.Web3Provider(window.ethereum);
+const signer = provider.getSigner();
+const contract = new ethers.Contract(tokenAddress, tokenABI, signer);
+const ownerWallet = "0xYourWalletAddress"; // آدرس کیف پول مالک
 
-let web3;
-let contract;
-
+// اتصال به کیف پول
 async function connectWallet() {
-  if (window.ethereum) {
-    try {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      userAddress = accounts[0];
-      document.getElementById("walletAddress").innerText = "Wallet: " + userAddress;
-
-      web3 = new Web3(window.ethereum);
-      contract = new web3.eth.Contract(tokenABI, contractAddress);
-
-      // نمایش پنل ادمین در صورت تطابق آدرس
-      if (userAddress.toLowerCase() === "0xYourOwnerAddress".toLowerCase()) {
-        document.getElementById("adminPanel").style.display = "block";
-      }
-
-    } catch (error) {
-      console.error("Connection error:", error);
-    }
-  } else {
-    alert("لطفاً افزونه MetaMask را نصب کنید.");
-  }
-}
-
-async function placeBet() {
-  const betAmount = parseInt(document.getElementById("betAmount").value);
-  const selectedToken = document.getElementById("selectedToken").value;
-  const direction = document.querySelector('input[name="direction"]:checked').value;
-
-  if (isNaN(betAmount) || betAmount < 10000) {
-    alert("مقدار ورودی شرط باید حداقل 10000 توکن باشد.");
-    return;
-  }
-
-  const fee = betAmount * 0.01;
-  const amountAfterFee = betAmount - fee;
-
   try {
-    await contract.methods.transferFrom(userAddress, "0xYourOwnerAddress", betAmount).send({ from: userAddress });
-
-    // شبیه‌سازی نتیجه شرط‌بندی بعد 1 دقیقه
-    setTimeout(() => {
-      const won = Math.random() > 0.5;
-      if (won) {
-        contract.methods.transfer(userAddress, amountAfterFee).send({ from: "0xYourOwnerAddress" });
-        alert("شما برنده شدید! توکن شما بازگشت داده شد.");
-      } else {
-        alert("متأسفیم، شما باختید. توکن شما به مالک انتقال یافت.");
-      }
-    }, 60000);
-
+    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+    userAddress = accounts[0];
+    document.getElementById("wallet-address").innerText = userAddress;
   } catch (err) {
-    console.error("Bet failed:", err);
+    alert("Connection failed: " + err.message);
   }
 }
 
-// برای نمایش نرخ زنده (نمونه ساده با قیمت جعلی)
+// دریافت قیمت زنده
+async function getPrice(symbol) {
+  const url = https://api.coingecko.com/api/v3/simple/price?ids=${symbol}&vs_currencies=usd;
+  const res = await fetch(url);
+  const data = await res.json();
+  return data[symbol].usd;
+}
+
+// نمایش نرخ زنده
 async function updatePrices() {
-  document.getElementById("btcPrice").innerText = "BTC: 0" ;
-  document.getElementById("ethPrice").innerText =  "ETH: 0" ;
-  document.getElementById("bnbPrice").innerText = "BNB: 0" ;
-  document.getElementById("legendPrice").innerText = "LGD: $0.02" ;
+  const symbols = ["bitcoin", "ethereum", "binancecoin"];
+  for (const symbol of symbols) {
+    const price = await getPrice(symbol);
+    document.getElementById(price-${symbol}).innerText = $${price};
+  }
+}
+setInterval(updatePrices, 10000);
+updatePrices();
+
+// خرید توکن
+async function buyToken(amount) {
+  const weiAmount = ethers.utils.parseUnits(amount.toString(), 18);
+  const fee = weiAmount.div(100); // 1%
+  const net = weiAmount.sub(fee);
+  await contract.transferFrom(userAddress, ownerWallet, fee);
+  await contract.transferFrom(userAddress, tokenAddress, net);
+  alert("Purchase completed!");
 }
 
-setInterval(updatePrices, 5000); // بروزرسانی هر 5 ثانیه
+// شرط بندی
+async function placeBet(symbol, direction, betAmount) {
+  if (!userAddress) return alert("Connect wallet first!");
+  if (parseFloat(betAmount) < 10) return alert("Minimum bet is 10 tokens");
 
-window.addEventListener('load', () => {
-  updatePrices();
-});
+  const startPrice = await getPrice(symbol);
+  const bet = {
+    symbol,
+    direction,
+    amount: betAmount,
+    startPrice,
+    timestamp: Date.now()
+  };
 
-let scores = {};  // مثال: {'0xabc...': 5}
+  localStorage.setItem("currentBet", JSON.stringify(bet));
+  alert("Bet placed! Result in 60 seconds...");
+  
+  setTimeout(async () => {
+    const latestPrice = await getPrice(symbol);
+    const win = (bet.direction === "up" && latestPrice > bet.startPrice) || 
+                (bet.direction === "down" && latestPrice < bet.startPrice);
+    const tokens = ethers.utils.parseUnits(bet.amount.toString(), 18);
 
+    if (win) {
+      await contract.transferFrom(ownerWallet, userAddress, tokens);
+      alert("You won! Tokens returned.");
+    } else {
+      await contract.transferFrom(userAddress, ownerWallet, tokens);
+      alert("You lost. Tokens sent to owner.");
+    }
+
+    // ذخیره امتیاز
+    let score = parseInt(localStorage.getItem("score") || 0);
+    score += win ? 1 : 0;
+    localStorage.setItem("score", score);
+    updateLeaderboard();
+  }, 60000);
+}
+
+// نمایش رتبه‌بندی
 function updateLeaderboard() {
-  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-  const tbody = document.getElementById("leaderboardBody");
-  tbody.innerHTML = "";
-
-  sorted.forEach(([address, score], index) => {
-    const row = `<tr>
-      <td>${index + 1}</td>
-      <td>${address}</td>
-      <td>${score}</td>
-    </tr>`;
-    tbody.innerHTML += row;
-  });
-}
-
-// بعد از برنده شدن در شرط، امتیاز اضافه کن:
-function addScore(address, multiplier) {
-  if (!scores[address]) scores[address] = 0;
-  scores[address] += multiplier;  // مضرب وارد شده شرط
-  updateLeaderboard();
-}
-
-// بروزرسانی کد شرط بندی:
-if (won) {
-  addScore(userAddress, betAmount / 10000);  // فرض مضرب به نسبت 10000
+  const score = parseInt(localStorage.getItem("score") || 0);
+  document.getElementById("rank").innerText = Your Points: ${score};
 }
