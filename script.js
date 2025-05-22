@@ -80,10 +80,10 @@ async function updatePrices() {
   document.getElementById("btcPrice").innerText = ;
   document.getElementById("ethPrice").innerText = ;
   document.getElementById("bnbPrice").innerText = ;
-  document.getElementById("legendPrice").innerText = "LGD: $0.02;
+  document.getElementById("legendPrice").innerText = "LGD: $0.02 ;
 }
 
-setInterval(updatePrices, 5000); // بروزرسانی هر 5 ثانیه
+setInterval(updatePrices, 50000); // بروزرسانی هر 5 ثانیه
 
 window.addEventListener('load', () => {
   updatePrices();
