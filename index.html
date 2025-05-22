@@ -1,151 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Legend Token Platform</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 </head>
 <body>
   <header>
-    <h1>Welcome to the LGD Platform</h1>
-    <p>The decentralized prediction and trading platform using LGD token.</p>
-  </header>
-
-  <!-- Wallet -->
-  <section>
-    <h2>Connect Your Wallet</h2>
-    <button id="connectWalletBtn">Connect MetaMask</button>
-    <p id="walletAddress">Wallet not connected</p>
-  </section>
-
-  <!-- Live Prices -->
-  <section>
-    <h2>Live Token Prices</h2>
-    <ul>
-      <li>BTC: <span id="priceBTC">Loading...</span></li>
-      <li>ETH: <span id="priceETH">Loading...</span></li>
-      <li>BNB: <span id="priceBNB">Loading...</span></li>
-      <li>LGD: <span id="priceLGD">Loading...</span></li>
-    </ul>
-    <div id="candlestickChart"></div>
-  </section>
-
-  <!-- شرط بندی با نمودار زنده -->
-<section id="shorting">
-  <h2>Short Tokens</h2>
-  <div class="token-options">
+    <h1>Legend Token Platform</h1>
+    <button onclick="connectWallet()">Connect Wallet</button>
+    <p id="walletAddress">Wallet: Not Connected</p>
+  </header>  <!-- Token Introduction -->  <section id="token-info">
+    <h2>Legend Token (LGD)</h2>
+    <p>Legend is a decentralized token designed for trading, betting, and gaming utilities. Symbol: <strong>LGD</strong></p>
+  </section>  <!-- Buy/Sell Token -->  <section id="buy-sell">
+    <h2>Buy/Sell LGD Token</h2>
+    <input type="number" id="buyAmount" placeholder="Amount to Buy" />
+    <button onclick="buyToken()">Buy</button>
+    <br /><br />
+    <input type="number" id="sellAmount" placeholder="Amount to Sell" />
+    <button onclick="sellToken()">Sell</button>
+  </section>  <!-- Shorting Section -->  <section id="shorting">
+    <h2>Short Tokens</h2>
     <label for="token">Choose Token:</label>
-    <select id="token">
+    <select id="token" onchange="updateChart()">
       <option value="BTCUSDT">Bitcoin (BTC)</option>
       <option value="ETHUSDT">Ethereum (ETH)</option>
       <option value="BNBUSDT">Binance (BNB)</option>
       <option value="LGD">Legend (LGD)</option>
-    </select>
-    
-    <label for="amount">Enter Amount (min 10000 LGD):</label>
-    <input type="number" id="amount" min="10000" step="10000" />
+    </select><label for="multiplier">Multiplier (1 to 5):</label>
+<select id="multiplier" onchange="autoFillAmount()">
+  <option value="1">x1</option>
+  <option value="2">x2</option>
+  <option value="3">x3</option>
+  <option value="4">x4</option>
+  <option value="5">x5</option>
+</select>
 
-    <label for="multiplier">Multiplier (1 to 5):</label>
-    <select id="multiplier">
-      <option value="1">x1</option>
-      <option value="2">x2</option>
-      <option value="3">x3</option>
-      <option value="4">x4</option>
-      <option value="5">x5</option>
-    </select>
+<label for="amount">Amount (min 10000 LGD):</label>
+<input type="number" id="amount" readonly />
 
-    <label>Prediction:</label>
-    <button onclick="submitShort('up')">Price will go UP</button>
-    <button onclick="submitShort('down')">Price will go DOWN</button>
-  </div>
+<label>Prediction:</label>
+<button onclick="submitShort('up')">Price will go UP</button>
+<button onclick="submitShort('down')">Price will go DOWN</button>
 
-  <!-- نمایش نمودار زنده -->
-  <div class="chart-container">
-    <iframe id="tradingview-chart"
-      src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_xxxx&symbol=BINANCE:BTCUSDT&interval=1&theme=dark&style=1&toolbar_bg=rgba(255, 255, 255, 1)&withdateranges=1&hide_side_toolbar=0&allow_symbol_change=1&save_image=1&studies=[]"
-      width="100%" height="400" frameborder="0" allowfullscreen></iframe>
-  </div>
-</section>
+<!-- Chart container -->
+<div class="chart-container">
+  <iframe id="tradingview-chart"
+    src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=1&theme=dark&style=1"
+    width="100%" height="400" frameborder="0" allowfullscreen></iframe>
+</div>
 
-  <!-- Buy/Sell -->
-  <section>
-    <h2>Buy / Sell LGD</h2>
-    <select id="tradeType">
-      <option value="buy">Buy</option>
-      <option value="sell">Sell</option>
-    </select>
-    <input type="number" id="tradeAmount" placeholder="Amount" min="1"/>
-    <button id="tradeBtn">Trade (1% fee)</button>
-    <p id="tradeMessage"></p>
-  </section>
-
-  <!-- Prediction Game -->
-  <section>
-    <h2>Prediction Betting</h2>
-    <form id="betForm">
-      <label for="token">Choose Token:</label>
-      <select id="token">
-        <option value="BTC">BTC</option>
-        <option value="ETH">ETH</option>
-        <option value="BNB">BNB</option>
-        <option value="LGD">LGD</option>
-      </select>
-
-      <label for="direction">Prediction:</label>
-      <select id="direction">
-        <option value="up">Will go UP</option>
-        <option value="down">Will go DOWN</option>
-      </select>
-
-      <label for="multiplier">Multiplier:</label>
-      <select id="multiplier" onchange="updateMinAmount()">
-        <option value="1">1x - Min 10,000 LGD</option>
-        <option value="2">2x - Min 20,000 LGD</option>
-        <option value="3">3x - Min 30,000 LGD</option>
-        <option value="4">4x - Min 40,000 LGD</option>
-        <option value="5">5x - Min 50,000 LGD</option>
-      </select>
-
-      <label for="betAmount">Amount (LGD):</label>
-      <input type="number" id="betAmount" min="10000" required/>
-
-      <button type="submit">Place Bet</button>
-    </form>
-    <p id="betMessage"></p>
-  </section>
-
-  <!-- Leaderboard -->
-  <section>
-    <h2>Top Players</h2>
+  </section>  <!-- Leaderboard -->  <section id="leaderboard">
+    <h2>Top Users</h2>
     <ul id="leaderboardList">
-      <!-- Top players will appear here -->
+      <li>Loading...</li>
     </ul>
-  </section>
-
-  <!-- Admin Panel -->
-  <section id="adminPanel" style="display: none;">
+  </section>  <!-- Admin Panel -->  <section id="admin-panel" style="display:none">
     <h2>Admin Panel</h2>
-    <p>You are the owner.</p>
-    <p>Total Fees Collected: <span id="ownerFees">0</span> LGD</p>
-  </section>
-
-  <footer>
-    <p>© 2025 Legend (LGD) Platform</p>
-  </footer>
-
-  <script>
-    function updateMinAmount() {
-      const multiplier = parseInt(document.getElementById("multiplier").value);
-      const minAmount = multiplier * 10000;
-      const input = document.getElementById("betAmount");
-      input.min = minAmount;
-      input.placeholder = Minimum ${minAmount} LGD;
-    }
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="app.js"></script>
-</body>
-                                                     </html>
+    <p>Welcome, owner! Here you can manage users and view platform data.</p>
+  </section>  <script src="script.js"></script></body>
+</html>
