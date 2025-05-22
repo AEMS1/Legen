@@ -39,6 +39,28 @@
       <option value="ETH">ETH</option>
       <option value="BNB">BNB</option>
       <option value="LGD">LGD</option>
+      <script>
+  async function fetchLivePrices() {
+    try {
+      const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin&vs_currencies=usd");
+      const data = await response.json();
+
+      document.getElementById("btcPrice").textContent = "$" + data.bitcoin.usd;
+      document.getElementById("ethPrice").textContent = "$" + data.ethereum.usd;
+      document.getElementById("bnbPrice").textContent = "$" + data.binancecoin.usd;
+
+      // قیمت فرضی LGD - توکن شما
+      const lgdPrice = "0.05";
+      document.getElementById("lgdPrice").textContent = "$" + lgdPrice;
+
+    } catch (err) {
+      console.error("خطا در دریافت قیمت‌ها:", err);
+    }
+  }
+
+  fetchLivePrices();
+  setInterval(fetchLivePrices, 10000);
+</script>
     </select>
     <label>مضرب ورود:</label>
     <select id="multiplier">
