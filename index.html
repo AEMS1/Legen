@@ -1,59 +1,123 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>Legendary Coin Platform</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Legendary Coin</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-  <script src="https://s3.tradingview.com/tv.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
+    .section { background: white; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; }
+    #adminPanel { display: none; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Legendary Coin (LGD)</h1>
+
+  <div class="section">
+    <h2>Legendary Token (LGD)</h2>
+    <p><strong>Symbol:</strong> LGD</p>
+    <p><strong>Contract Address:</strong> 0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842</p>
+    <p><strong>Description:</strong> LGD is the native utility token used for predictions and trading in our decentralized app.</p>
     <button onclick="connectWallet()">Connect Wallet</button>
-  </header>  <section id="intro">
-    <h2>About LGD</h2>
-    <p>LGD is a community-driven token designed for secure, fast, and decentralized transactions with real use cases like staking and betting.</p>
-  </section>  <section id="token-trade">
-    <h2>Buy/Sell LGD</h2>
-    <label for="trade-amount">Amount:</label>
-    <input type="number" id="trade-amount" min="1">
-    <button onclick="buyTokens()">Buy LGD</button>
-    <button onclick="sellTokens()">Sell LGD</button>
-  </section>  <section id="betting">
-    <h2>Short Token Betting</h2>
-    <label for="bet-token">Token to Bet On:</label>
-    <select id="bet-token" onchange="loadTradingViewChart()">
-      <option value="BINANCE:BTCUSDT">BTC</option>
-      <option value="BINANCE:ETHUSDT">ETH</option>
-      <option value="BINANCE:BNBUSDT">BNB</option>
-    </select><label for="multiplier">Multiplier (1-5):</label>
-<select id="multiplier" onchange="autoFillBetAmount()">
-  <option value="1">x1</option>
-  <option value="2">x2</option>
-  <option value="3">x3</option>
-  <option value="4">x4</option>
-  <option value="5">x5</option>
-</select>
+    <p id="walletAddress"></p>
+  </div>
 
-<label for="bet-direction">Direction:</label>
-<select id="bet-direction">
-  <option value="up">Up</option>
-  <option value="down">Down</option>
-</select>
+  <div class="section">
+    <h2>Buy / Sell LGD</h2>
+    <input type="number" id="tokenAmount" placeholder="Amount of LGD" />
+    <button onclick="buyToken()">Buy</button>
+    <button onclick="sellToken()">Sell</button>
+  </div>
 
-<label for="bet-amount">LGD Amount (min 10000):</label>
-<input type="number" id="bet-amount" min="10000">
-<button onclick="placeBet()">Place Bet</button>
+  <div class="section">
+    <h2>Prediction (Short Betting)</h2>
+    <label for="tokenSelect">Select Token:</label>
+    <select id="tokenSelect" onchange="updateChart()">
+      <option value="BINANCE:BTCUSDT">Bitcoin (BTC)</option>
+      <option value="BINANCE:ETHUSDT">Ethereum (ETH)</option>
+      <option value="BINANCE:BNBUSDT">Binance Coin (BNB)</option>
+      <option value="CUSTOM:LGD">Legendary Token (LGD)</option>
+    </select><br><br>
 
-<div id="tradingview_chart" style="height:400px;"></div>
+    <label for="multiplier">Select Multiplier:</label>
+    <select id="multiplier" onchange="updateRequiredTokens()">
+      <option value="1">1x</option>
+      <option value="2">2x</option>
+      <option value="3">3x</option>
+      <option value="4">4x</option>
+      <option value="5">5x</option>
+    </select><br><br>
 
-  </section>  <section id="leaderboard">
-    <h2>Top Users</h2>
-    <ul id="leaderboard-list"></ul>
-  </section>  <section id="admin">
-    <h2>Owner Panel</h2>
-    <p>Total Earnings: <span id="total-earnings">0</span> LGD</p>
-    <button onclick="withdrawEarnings()">Withdraw to Owner Wallet</button>
-  </section>  <script src="script.js"></script></body>
+    <p>Required LGD Tokens: <span id="requiredTokens">10000</span></p>
+
+    <button onclick="placeBet('up')">Bet UP</button>
+    <button onclick="placeBet('down')">Bet DOWN</button>
+
+    <div id="tradingview_chart" style="margin-top:20px;"></div>
+  </div>
+
+  <div class="section">
+    <h2>Leaderboard</h2>
+    <ul id="leaderboard">
+      <li>User1 - 1200 points</li>
+      <li>User2 - 950 points</li>
+    </ul>
+  </div>
+
+  <div class="section" id="adminPanel">
+    <h2>Admin Panel</h2>
+    <p>Only visible to contract owner (0xec54951C7d4619256Ea01C811fFdFa01A9925683)</p>
+    <!-- Admin functionalities like withdrawing tokens, viewing total volume, etc. -->
+  </div>
+
+  <script>
+    let wallet = "";
+    const minBet = 10000;
+    const owner = "0xec54951C7d4619256Ea01C811fFdFa01A9925683";
+
+    function connectWallet() {
+      if (typeof window.ethereum !== 'undefined') {
+        window.ethereum.request({ method: 'eth_requestAccounts' }).then(accounts => {
+          wallet = accounts[0];
+          document.getElementById("walletAddress").innerText = "Connected: " + wallet;
+          if (wallet.toLowerCase() === owner.toLowerCase()) {
+            document.getElementById("adminPanel").style.display = "block";
+          }
+        });
+      } else {
+        alert("MetaMask not found");
+      }
+    }
+
+    function updateRequiredTokens() {
+      const multiplier = parseInt(document.getElementById("multiplier").value);
+      const required = multiplier * minBet;
+      document.getElementById("requiredTokens").innerText = required;
+    }
+
+    function updateChart() {
+      const token = document.getElementById("tokenSelect").value;
+      const chartContainer = document.getElementById("tradingview_chart");
+      chartContainer.innerHTML = `
+        <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_chart&amp;symbol=${token}&amp;interval=1&amp;theme=dark&amp;style=1&amp;locale=en&amp;toolbar_bg=rgba(0, 0, 0, 1)&amp;hide_side_toolbar=false&amp;allow_symbol_change=true&amp;save_image=false&amp;studies=[]" width="100%" height="400" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+      `;
+    }
+
+    function placeBet(direction) {
+      const multiplier = parseInt(document.getElementById("multiplier").value);
+      const required = multiplier * minBet;
+      alert(Placing ${direction.toUpperCase()} bet with ${required} LGD tokens...);
+      // Integrate smart contract interaction logic here
+    }
+
+    function buyToken() {
+      alert("Buying token... +1% fee to owner");
+      // smart contract interaction
+    }
+
+    function sellToken() {
+      alert("Selling token... +1% fee to owner");
+      // smart contract interaction
+    }
+  </script>
+</body>
 </html>
