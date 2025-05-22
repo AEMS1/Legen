@@ -1,26 +1,4 @@
-[۸:۳۸, ۱۴۰۴/۳/۱] Aems: <script>
-  async function fetchLivePrices() {
-    try {
-      const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin&vs_currencies=usd");
-      const data = await response.json();
-
-      document.getElementById("btcPrice").textContent = "$" + data.bitcoin.usd;
-      document.getElementById("ethPrice").textContent = "$" + data.ethereum.usd;
-      document.getElementById("bnbPrice").textContent = "$" + data.binancecoin.usd;
-
-      // قیمت فرضی LGD - توکن شما
-      const lgdPrice = "0.05";
-      document.getElementById("lgdPrice").textContent = "$" + lgdPrice;
-
-    } catch (err) {
-      console.error("خطا در دریافت قیمت‌ها:", err);
-    }
-  }
-
-  fetchLivePrices();
-  setInterval(fetchLivePrices, 10000);
-</script>
-[۸:۴۴, ۱۴۰۴/۳/۱] Aems: <!DOCTYPE html><html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
