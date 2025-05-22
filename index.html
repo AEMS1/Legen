@@ -1,79 +1,64 @@
-<!DOCTYPE html>
-<html lang="fa">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>سایت Legendary Coin</title>
+  <title>Legendary Coin Platform</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Tahoma, sans-serif; background-color: #f0f0f0; padding: 20px; }
+    body { font-family: Arial, sans-serif; background-color: #f0f0f0; padding: 20px; }
     .section { background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; }
     #adminPanel { display: none; }
     label { display: block; margin-top: 10px; }
     select, input { width: 100%; padding: 8px; margin-top: 5px; }
     button { margin-top: 10px; padding: 10px 20px; }
+    iframe { width: 100%; border: none; height: 400px; margin-top: 20px; }
   </style>
 </head>
-<body>
-
-  <div class="section">
-    <h2>معرفی توکن LGD</h2>
-    <p><strong>نماد:</strong> LGD</p>
-    <p><strong>آدرس قرارداد:</strong> 0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842</p>
-    <p><strong>توضیحات:</strong> LGD توکن بومی پلتفرم ماست که برای پیش‌بینی و معاملات در اپلیکیشن غیرمتمرکز ما استفاده می‌شود.</p>
-    <button onclick="connectWallet()">اتصال کیف پول</button>
+<body>  <div class="section">
+    <h2>About LGD Token</h2>
+    <p><strong>Symbol:</strong> LGD</p>
+    <p><strong>Contract Address:</strong> 0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842</p>
+    <p>Legendary Token (LGD) powers our prediction and trading platform.</p>
+    <button onclick="connectWallet()">Connect Wallet</button>
     <p id="walletAddress"></p>
-  </div>
-
-  <div class="section">
-    <h2>خرید / فروش LGD</h2>
-    <label for="tokenAmount">مقدار LGD:</label>
-    <input type="number" id="tokenAmount" placeholder="مقدار توکن">
-    <button onclick="buyToken()">خرید</button>
-    <button onclick="sellToken()">فروش</button>
-  </div>
-
-  <div class="section">
-    <h2>شرت‌بندی (Short Betting)</h2>
-    <label for="tokenSelect">انتخاب توکن:</label>
+  </div>  <div class="section">
+    <h2>Buy / Sell LGD</h2>
+    <label for="tokenAmount">Amount (LGD):</label>
+    <input type="number" id="tokenAmount" placeholder="Enter amount">
+    <button onclick="buyToken()">Buy</button>
+    <button onclick="sellToken()">Sell</button>
+  </div>  <div class="section">
+    <h2>Short Prediction</h2>
+    <label for="tokenSelect">Choose Token:</label>
     <select id="tokenSelect" onchange="updateChart()">
       <option value="BINANCE:BTCUSDT">Bitcoin (BTC)</option>
       <option value="BINANCE:ETHUSDT">Ethereum (ETH)</option>
       <option value="BINANCE:BNBUSDT">Binance Coin (BNB)</option>
       <option value="CUSTOM:LGD">Legendary Token (LGD)</option>
-    </select>
+    </select><label for="multiplier">Multiplier:</label>
+<select id="multiplier" onchange="updateRequiredTokens()">
+  <option value="1">1x</option>
+  <option value="2">2x</option>
+  <option value="3">3x</option>
+  <option value="4">4x</option>
+  <option value="5">5x</option>
+</select>
 
-    <label for="multiplier">انتخاب مضرب:</label>
-    <select id="multiplier" onchange="updateRequiredTokens()">
-      <option value="1">1x</option>
-      <option value="2">2x</option>
-      <option value="3">3x</option>
-      <option value="4">4x</option>
-      <option value="5">5x</option>
-    </select>
+<p>Required LGD: <span id="requiredTokens">10000</span></p>
+<button onclick="placeBet('up')">Predict Up</button>
+<button onclick="placeBet('down')">Predict Down</button>
 
-    <p>مقدار مورد نیاز LGD: <span id="requiredTokens">10000</span></p>
+<div id="tradingview_chart"></div>
 
-    <button onclick="placeBet('up')">شرط بالا</button>
-    <button onclick="placeBet('down')">شرط پایین</button>
-
-    <div id="tradingview_chart" style="margin-top:20px;"></div>
-  </div>
-
-  <div class="section">
-    <h2>رتبه‌بندی کاربران</h2>
+  </div>  <div class="section">
+    <h2>Top Users</h2>
     <ul id="leaderboard">
-      <li>کاربر۱ - ۱۲۰۰ امتیاز</li>
-      <li>کاربر۲ - ۹۵۰ امتیاز</li>
+      <li>User1 - 1200 points</li>
+      <li>User2 - 950 points</li>
     </ul>
-  </div>
-
-  <div class="section" id="adminPanel">
-    <h2>پنل مدیریت</h2>
-    <p>فقط برای مالک قرارداد قابل مشاهده است.</p>
-    <!-- امکانات مدیریتی مانند برداشت توکن‌ها، مشاهده حجم کل، و غیره -->
-  </div>
-
-  <script>
+  </div>  <div class="section" id="adminPanel">
+    <h2>Admin Panel</h2>
+    <p>Visible only to contract owner.</p>
+  </div>  <script>
     let wallet = "";
     const minBet = 10000;
     const owner = "0xec54951C7d4619256Ea01C811fFdFa01A9925683";
@@ -82,46 +67,45 @@
       if (typeof window.ethereum !== 'undefined') {
         window.ethereum.request({ method: 'eth_requestAccounts' }).then(accounts => {
           wallet = accounts[0];
-          document.getElementById("walletAddress").innerText = "متصل شده: " + wallet;
+          document.getElementById("walletAddress").innerText = "Connected: " + wallet;
           if (wallet.toLowerCase() === owner.toLowerCase()) {
             document.getElementById("adminPanel").style.display = "block";
           }
         });
       } else {
-        alert("MetaMask یافت نشد");
+        alert("MetaMask not found");
       }
     }
 
     function updateRequiredTokens() {
       const multiplier = parseInt(document.getElementById("multiplier").value);
-      const required = multiplier * minBet;
-      document.getElementById("requiredTokens").innerText = required;
+      document.getElementById("requiredTokens").innerText = multiplier * minBet;
     }
 
     function updateChart() {
       const token = document.getElementById("tokenSelect").value;
       const chartContainer = document.getElementById("tradingview_chart");
+      if (token.startsWith("CUSTOM")) {
+        chartContainer.innerHTML = '<p>No chart available for custom tokens.</p>';
+        return;
+      }
       chartContainer.innerHTML = `
-        <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_chart&amp;symbol=${token}&amp;interval=1&amp;theme=dark&amp;style=1&amp;locale=fa&amp;toolbar_bg=rgba(0, 0, 0, 1)&amp;hide_side_toolbar=false&amp;allow_symbol_change=true&amp;save_image=false&amp;studies=[]" width="100%" height="400" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+        <iframe src="https://s.tradingview.com/widgetembed/?symbol=${token}&interval=1&theme=light&style=1&locale=en" allowfullscreen></iframe>
       `;
     }
 
     function placeBet(direction) {
       const multiplier = parseInt(document.getElementById("multiplier").value);
       const required = multiplier * minBet;
-      alert(در حال ثبت شرط ${direction.toUpperCase()} با ${required} توکن LGD...);
-      // اینجا کد تعامل با قرارداد هوشمند را اضافه کنید
+      alert(Placing a ${direction.toUpperCase()} bet with ${required} LGD...);
     }
 
     function buyToken() {
-      alert("در حال خرید توکن... کارمزد ۱٪ به مالک منتقل می‌شود.");
-      // اینجا کد تعامل با قرارداد هوشمند را اضافه کنید
+      alert("Buying LGD token with 1% fee...");
     }
 
     function sellToken() {
-      alert("در حال فروش توکن... کارمزد ۱٪ به مالک منتقل می‌شود.");
-      // اینجا کد تعامل با قرارداد هوشمند را اضافه کنید
+      alert("Selling LGD token with 1% fee...");
     }
-  </script>
-</body>
+  </script></body>
 </html>
