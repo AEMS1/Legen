@@ -1,98 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Legendary Coin Platform</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Legend Token Platform</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <h1>Legendary Coin (LGD)</h1>
+    <h1>Legend (LGD) Token</h1>
     <button onclick="connectWallet()">Connect Wallet</button>
-    <div id="wallet-address"></div>
+    <p id="walletAddress"></p>
   </header>
 
-  <!-- Token Introduction -->
-  <section>
-    <h2>About LGD Token</h2>
-    <p>Legendary Coin (LGD) is a utility token used for participation, betting, and rewards on this platform.</p>
+  <section id="intro">
+    <h2>Token Information</h2>
+    <p><strong>Symbol:</strong> LGD</p>
+    <p><strong>Smart Contract:</strong> 0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842</p>
   </section>
 
-  <!-- Buy/Sell Section -->
-  <section>
+  <section id="buy-sell">
     <h2>Buy / Sell LGD</h2>
-    <label>Amount:</label>
-    <input type="number" id="tokenAmount" placeholder="Enter amount">
-    <button onclick="buyToken()">Buy</button>
-    <button onclick="sellToken()">Sell</button>
-    <p>*1% fee goes to platform owner</p>
+    <input type="number" id="amount" placeholder="Amount in BNB">
+    <button onclick="buyToken()">Buy LGD</button>
+    <button onclick="sellToken()">Sell LGD</button>
   </section>
 
-  <!-- Live Prices -->
-  <section>
-    <h2>Live Token Prices</h2>
-    <div id="live-prices">
-      <p>BTC: <span id="btc-price">Loading...</span></p>
-      <p>ETH: <span id="eth-price">Loading...</span></p>
-      <p>BNB: <span id="bnb-price">Loading...</span></p>
-      <p>LGD: <span id="lgd-price">Loading...</span></p>
-    </div>
-    <canvas id="priceChart" width="400" height="200"></canvas>
+  <section id="live-prices">
+    <h2>Live Prices</h2>
+    <div id="price-btc">BTC: Loading...</div>
+    <div id="price-eth">ETH: Loading...</div>
+    <div id="price-bnb">BNB: Loading...</div>
   </section>
 
-  <!-- Betting Section -->
-  <section>
-    <h2>Token Betting</h2>
-    <label>Select Token:</label>
-    <select id="selectedToken">
-      <option value="BTC">Bitcoin (BTC)</option>
-      <option value="ETH">Ethereum (ETH)</option>
-      <option value="BNB">Binance Coin (BNB)</option>
-      <option value="LGD">Legendary (LGD)</option>
+  <section id="candles">
+    <h2>Live Charts</h2>
+    <iframe src="https://www.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT" width="100%" height="300"></iframe>
+    <iframe src="https://www.tradingview.com/widgetembed/?symbol=BINANCE:ETHUSDT" width="100%" height="300"></iframe>
+    <iframe src="https://www.tradingview.com/widgetembed/?symbol=BINANCE:BNBUSDT" width="100%" height="300"></iframe>
+  </section>
+
+  <section id="betting">
+    <h2>Token Betting (Only with LGD)</h2>
+    <select id="bet-token">
+      <option value="BTC">BTC</option>
+      <option value="ETH">ETH</option>
+      <option value="BNB">BNB</option>
     </select>
-
-    <label>Choose Direction:</label>
-    <select id="direction">
+    <input type="number" id="bet-amount" placeholder="Min 10000 LGD">
+    <select id="bet-direction">
       <option value="up">Price Up</option>
       <option value="down">Price Down</option>
     </select>
-
-    <label>Multiplier:</label>
-    <select id="multiplier">
-      <option value="1">x1 (10,000 LGD)</option>
-      <option value="2">x2 (15,000 LGD)</option>
-      <option value="3">x3 (20,000 LGD)</option>
-      <option value="4">x4 (25,000 LGD)</option>
-      <option value="5">x5 (30,000 LGD)</option>
-    </select>
-
     <button onclick="placeBet()">Place Bet</button>
-    <div id="bet-result"></div>
+    <p id="timer">Time Left: --</p>
+    <p id="bet-result"></p>
   </section>
 
-  <!-- Leaderboard -->
-  <section>
+  <section id="leaderboard">
     <h2>Top Players</h2>
-    <div id="leaderboard">
-      <p>Loading leaderboard...</p>
-    </div>
-    <p>Next reset in: <span id="countdown">Loading...</span></p>
+    <ul id="leaderboard-list">
+      <!-- Leaderboard entries go here -->
+    </ul>
   </section>
 
-  <!-- Admin Panel (only visible to owner) -->
-  <section id="admin-panel" style="display: none;">
+  <section id="admin-panel" style="display:none;">
     <h2>Admin Panel</h2>
-    <p>Wallet connected as owner.</p>
-    <p>Manage token, bets, and users here (functionality coming in backend).</p>
+    <p>Welcome, owner!</p>
+    <p>You can view earnings, users, and manage the platform.</p>
   </section>
 
   <footer>
-    <p>&copy; 2025 Legendary Platform. All rights reserved.</p>
+    <p>All rights reserved © 2025 - LEGEND Token</p>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="web3.min.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
