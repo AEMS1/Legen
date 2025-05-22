@@ -1,81 +1,91 @@
-body {
-  font-family: Arial, sans-serif;
-  background-color: #0e0e0e;
-  color: #ffffff;
+/* Reset و پایه */
+body, html {
   margin: 0;
   padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
 }
 
+/* هدر */
 header {
-  background-color: #1f1f1f;
-  padding: 20px;
+  background-color: #222;
+  color: #fff;
+  padding: 1rem;
   text-align: center;
-  border-bottom: 1px solid #333;
 }
 
-header h1 {
-  margin: 0;
-  color: #FFD700;
-}
-
-.container {
-  padding: 20px;
-  max-width: 1000px;
-  margin: auto;
-}
-
+/* بخش‌ها */
 section {
-  background-color: #1c1c1c;
-  margin-bottom: 20px;
-  padding: 20px;
+  padding: 1.5rem;
+  margin: 1rem auto;
+  max-width: 900px;
+  background: white;
   border-radius: 10px;
-  border: 1px solid #333;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-h2 {
-  color: #00ffff;
-  margin-top: 0;
+/* فرم‌ها */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 input, select, button {
-  padding: 10px;
-  margin-top: 10px;
-  margin-right: 10px;
-  background-color: #333;
-  color: #fff;
-  border: 1px solid #444;
-  border-radius: 5px;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
 }
 
-button:hover {
-  background-color: #555;
+button {
+  background-color: #007bff;
+  color: white;
   cursor: pointer;
+  border: none;
+  transition: 0.3s;
+}
+button:hover {
+  background-color: #0056b3;
 }
 
-table {
+/* کارت‌ها */
+.card {
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: #eef;
+  margin: 0.5rem 0;
+}
+
+/* لیست رتبه‌بندی */
+.ranking-list {
+  list-style: none;
+  padding: 0;
+}
+.ranking-list li {
+  padding: 0.5rem;
+  background: #f3f3f3;
+  border-bottom: 1px solid #ddd;
+}
+
+/* نمودارها */
+.chart-container {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
+  height: 300px;
+  margin-top: 1rem;
+  background: #fff;
+  border: 1px solid #ccc;
 }
 
-table, th, td {
-  border: 1px solid #444;
-}
+/* واکنش‌گرا */
+@media (max-width: 600px) {
+  section {
+    margin: 0.5rem;
+    padding: 1rem;
+  }
 
-th, td {
-  padding: 10px;
-  text-align: center;
-}
-
-.admin-only {
-  display: none;
-}
-
-footer {
-  background-color: #1f1f1f;
-  text-align: center;
-  padding: 15px;
-  font-size: 14px;
-  color: #888;
-  border-top: 1px solid #333;
+  input, button, select {
+    font-size: 0.95rem;
+  }
 }
