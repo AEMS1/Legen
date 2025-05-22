@@ -1,66 +1,64 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Legend Token (LGD)</title>
-  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background-color: #0e0e0e; color: white; }
-    button { padding: 10px 15px; background: #ffb300; border: none; border-radius: 5px; cursor: pointer; }
-    #admin-panel { display: none; margin-top: 20px; padding: 10px; background: #222; border-radius: 10px; }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Legend Token Site</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body><h1>Welcome to the Official Site of Legend Token (LGD)</h1><!-- Wallet Connection --><button onclick="connectWallet()">Connect Wallet</button>
+<body>
 
-<p id="wallet-address"></p><!-- Admin Panel (only visible to owner) --><div id="admin-panel">
-  <h2>Admin Panel</h2>
-  <p>You are connected as the owner.</p>
-  <!-- You can add management features here -->
-</div><!-- Token Information --><section id="token-info">
-  <h2>Token Details</h2>
-  <p><strong>Name:</strong> Legend</p>
-  <p><strong>Symbol:</strong> LGD</p>
-  <p><strong>Total Supply:</strong> 990,000,000</p>
-  <p><strong>Contract Address:</strong> 0x4751C0DE56EFB3770615097347cbF131D302498A</p>
-</section><!-- Buy Token --><section>
-  <h2>Buy LGD Token</h2>
-  <a href="https://pancakeswap.finance/swap?outputCurrency=0x4751C0DE56EFB3770615097347cbF131D302498A" target="_blank">
-    Buy on PancakeSwap
-  </a>
-</section><!-- Live Price Feed --><section>
-  <h2>Live Prices</h2>
-  <p id="lgd-price">Loading token prices...</p>
-</section><script>
-async function connectWallet() {
-  if (window.ethereum) {
-    try {
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-      const walletAddress = accounts[0];
-      document.getElementById("wallet-address").innerText = "Wallet: " + walletAddress;
+  <header>
+    <h1>Legend (LGD) Token</h1>
+    <button onclick="connectWallet()">Connect Wallet</button>
+    <p id="wallet-address"></p>
+  </header>
 
-      const owner = "0xec54951C7d4619256Ea01C811fFdFa01A9925683";
-      if (walletAddress.toLowerCase() === owner.toLowerCase()) {
-        document.getElementById("admin-panel").style.display = "block";
-      }
-    } catch (err) {
-      alert("Failed to connect wallet: " + err.message);
-    }
-  } else {
-    alert("Please install MetaMask to connect your wallet.");
-  }
-}
+  <section id="live-prices">
+    <!-- نرخ زنده توکن‌ها اینجا نمایش داده می‌شود -->
+  </section>
 
-// Load token prices
-fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin&vs_currencies=usd")
-  .then(response => response.json())
-  .then(data => {
-    const btc = data.bitcoin.usd;
-    const eth = data.ethereum.usd;
-    const bnb = data.binancecoin.usd;
-    document.getElementById("lgd-price").innerText = BTC: $${btc} | ETH: $${eth} | BNB: $${bnb};
-  })
-  .catch(() => {
-    document.getElementById("lgd-price").innerText = "Failed to load price data.";
-  });
-</script></body>
+  <section id="token-info">
+    <h2>Token Info</h2>
+    <p><strong>Symbol:</strong> LGD</p>
+    <p><strong>Total Supply:</strong> 990,000,000</p>
+    <p><strong>Network:</strong> Binance Smart Chain (BNB)</p>
+    <p><strong>Contract:</strong> 0x4751C0DE56EFB3770615097347cbF131D302498A</p>
+  </section>
+
+  <section id="bet-section">
+    <h2>Prediction Game</h2>
+    <label for="select-token">Select Token:</label>
+    <select id="select-token">
+      <option value="BTC">Bitcoin</option>
+      <option value="ETH">Ethereum</option>
+      <option value="BNB">BNB</option>
+      <option value="LGD">Legend</option>
+    </select>
+
+    <label for="select-multiplier">Select Multiplier:</label>
+    <select id="select-multiplier">
+      <option value="1">x1 (10,000 LGD)</option>
+      <option value="2">x2 (15,000 LGD)</option>
+      <option value="3">x3 (20,000 LGD)</option>
+      <option value="4">x4 (25,000 LGD)</option>
+      <option value="5">x5 (30,000 LGD)</option>
+    </select>
+
+    <button onclick="submitPrediction()">Enter Prediction</button>
+    <p id="countdown"></p>
+  </section>
+
+  <section id="leaderboard-section">
+    <h2>Top 10 Players</h2>
+    <div id="leaderboard"></div>
+  </section>
+
+  <section id="admin-panel" style="display:none;">
+    <h2>Admin Panel</h2>
+    <p>Only visible for the token owner</p>
+  </section>
+
+  <script src="script.js"></script>
+</body>
 </html>
