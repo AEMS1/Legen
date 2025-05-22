@@ -1,64 +1,130 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Legend Token Platform</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <meta charset="UTF-8">
+  <title>Legendary Coin Betting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial; margin: 20px; background: #121212; color: white; }
+    label, select, input, button { display: block; margin: 10px 0; }
+    input, select, button { padding: 10px; font-size: 16px; }
+    #tradingview_chart iframe { border-radius: 10px; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Legend Token Platform</h1>
-    <button onclick="connectWallet()">Connect Wallet</button>
-    <p id="walletAddress">Wallet: Not Connected</p>
-  </header>  <!-- Token Introduction -->  <section id="token-info">
-    <h2>Legend Token (LGD)</h2>
-    <p>Legend is a decentralized token designed for trading, betting, and gaming utilities. Symbol: <strong>LGD</strong></p>
-  </section>  <!-- Buy/Sell Token -->  <section id="buy-sell">
-    <h2>Buy/Sell LGD Token</h2>
-    <input type="number" id="buyAmount" placeholder="Amount to Buy" />
-    <button onclick="buyToken()">Buy</button>
-    <br /><br />
-    <input type="number" id="sellAmount" placeholder="Amount to Sell" />
-    <button onclick="sellToken()">Sell</button>
-  </section>  <!-- Shorting Section -->  <section id="shorting">
-    <h2>Short Tokens</h2>
-    <label for="token">Choose Token:</label>
-    <select id="token" onchange="updateChart()">
-      <option value="BTCUSDT">Bitcoin (BTC)</option>
-      <option value="ETHUSDT">Ethereum (ETH)</option>
-      <option value="BNBUSDT">Binance (BNB)</option>
-      <option value="LGD">Legend (LGD)</option>
-    </select><label for="multiplier">Multiplier (1 to 5):</label>
-<select id="multiplier" onchange="autoFillAmount()">
-  <option value="1">x1</option>
-  <option value="2">x2</option>
-  <option value="3">x3</option>
-  <option value="4">x4</option>
-  <option value="5">x5</option>
-</select>
 
-<label for="amount">Amount (min 10000 LGD):</label>
-<input type="number" id="amount" readonly />
+  <h1>Legendary Token Betting</h1>
 
-<label>Prediction:</label>
-<button onclick="submitShort('up')">Price will go UP</button>
-<button onclick="submitShort('down')">Price will go DOWN</button>
+  <!-- Wallet Connect -->
+  <button onclick="connectWallet()">Connect Wallet</button>
+  <p id="walletStatus">Wallet not connected</p>
 
-<!-- Chart container -->
-<div class="chart-container">
-  <iframe id="tradingview-chart"
-    src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=1&theme=dark&style=1"
-    width="100%" height="400" frameborder="0" allowfullscreen></iframe>
-</div>
+  <!-- Multiplier Selection -->
+  <label for="multiplier">Select Multiplier:</label>
+  <select id="multiplier" onchange="updateTokenAmount()">
+    <option value="1">x1</option>
+    <option value="2">x2</option>
+    <option value="3">x3</option>
+    <option value="4">x4</option>
+    <option value="5">x5</option>
+  </select>
 
-  </section>  <!-- Leaderboard -->  <section id="leaderboard">
-    <h2>Top Users</h2>
-    <ul id="leaderboardList">
-      <li>Loading...</li>
-    </ul>
-  </section>  <!-- Admin Panel -->  <section id="admin-panel" style="display:none">
-    <h2>Admin Panel</h2>
-    <p>Welcome, owner! Here you can manage users and view platform data.</p>
-  </section>  <script src="script.js"></script></body>
+  <!-- Auto Token Amount -->
+  <label for="tokenAmount">Token Amount (LGD):</label>
+  <input type="number" id="tokenAmount" readonly>
+
+  <!-- Choose Token to Bet On -->
+  <label for="tokenChartSelect">Choose Token to Bet:</label>
+  <select id="tokenChartSelect" onchange="loadTokenChart()">
+    <option value="BTCUSDT">Bitcoin (BTC)</option>
+    <option value="ETHUSDT">Ethereum (ETH)</option>
+    <option value="BNBUSDT">BNB</option>
+    <option value="LGDUSDT">Legend (LGD)</option>
+  </select>
+
+  <!-- Choose Bet Direction -->
+  <label>Direction:</label>
+  <input type="radio" name="direction" value="up" checked> Up
+  <input type="radio" name="direction" value="down"> Down
+
+  <!-- Submit Bet -->
+  <button onclick="submitBet()">Place Bet</button>
+
+  <!-- Chart -->
+  <h2>Live Chart</h2>
+  <div id="tradingview_chart">
+    <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=1&theme=dark"
+      width="100%" height="400" frameborder="0" allowfullscreen></iframe>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    let userWallet = "";
+    const baseAmount = 10000;
+    const ownerWallet = "0xec54951C7d4619256Ea01C811fFdFa01A9925683";
+
+    async function connectWallet() {
+      if (window.ethereum) {
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        userWallet = accounts[0];
+        document.getElementById("walletStatus").textContent = "Connected: " + userWallet;
+      } else {
+        alert("MetaMask not found.");
+      }
+    }
+
+    function updateTokenAmount() {
+      const multiplier = document.getElementById("multiplier").value;
+      document.getElementById("tokenAmount").value = baseAmount * multiplier;
+    }
+
+    function loadTokenChart() {
+      const token = document.getElementById("tokenChartSelect").value;
+      const chartContainer = document.getElementById("tradingview_chart");
+      chartContainer.innerHTML = `
+        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:${token}&interval=1&theme=dark"
+          width="100%" height="400" frameborder="0" allowfullscreen></iframe>`;
+    }
+
+    async function submitBet() {
+      const amount = parseInt(document.getElementById("tokenAmount").value);
+      const direction = document.querySelector('input[name="direction"]:checked').value;
+      const selectedToken = document.getElementById("tokenChartSelect").value;
+
+      if (!userWallet || !amount) {
+        alert("Please connect wallet and select amount.");
+        return;
+      }
+
+      // 1% fee calculation
+      const fee = amount * 0.01;
+      const amountAfterFee = amount - fee;
+
+      try {
+        const contractAddress = "0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842";
+        const abi = [{"inputs":[{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}];
+
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, abi, signer);
+
+        await contract.transfer(ownerWallet, fee.toString());
+        alert("Bet placed with fee sent. Direction: " + direction);
+
+        // simulate result after 1 minute
+        setTimeout(() => {
+          const result = Math.random() > 0.5 ? "win" : "lose";
+          alert("Result: " + result);
+        }, 60000);
+
+      } catch (err) {
+        console.error(err);
+        alert("Transaction failed.");
+      }
+    }
+  </script>
+
+  <!-- Ethers.js -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
+</body>
 </html>
