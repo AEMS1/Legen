@@ -5,73 +5,113 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Legend Token Platform</title>
   <link rel="stylesheet" href="style.css" />
-  <script defer src="app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Legend Token Platform</h1>
-    <button id="connectWallet">Connect Wallet</button>
-    <span id="walletAddress"></span>
-  </header>
+  <!-- بخش معرفی توکن -->
+  <section id="token-info">
+    <h1>Legend Token (LGD)</h1>
+    <p>Total Supply: 990,000,000 LGD</p>
+    <p>Contract: <code>0x4751C0DE56EFB3770615097347cbF131D302498A</code></p>
+    <img src="logo.png" alt="Legend Token Logo" width="100" />
+  </section>
 
-  <main>
-    <section id="tokenInfo">
-      <h2>About LGD</h2>
-      <p>Legend Token (LGD) is a utility token built on BNB Chain designed to offer secure, decentralized access to a fun prediction platform with real rewards and ranking. Holders can trade, stake, and engage in prediction games.</p>
-    </section>
+  <!-- اتصال کیف پول -->
+  <section id="wallet-connect">
+    <button onclick="connectWallet()">Connect Wallet</button>
+    <p id="wallet-address"></p>
+  </section>
 
-    <section id="buySell">
-      <h2>Buy / Sell LGD</h2>
-      <p>Use PancakeSwap to trade. (1% fee)</p>
-      <a href="https://pancakeswap.finance/swap?outputCurrency=0x4751C0DE56EFB3770615097347cbF131D302498A" target="_blank">Trade on PancakeSwap</a>
-      <div id="lgdPrice">Current LGD Price: Loading...</div>
-    </section>
+  <!-- خرید و فروش توکن -->
+  <section id="token-swap">
+    <h2>Buy / Sell LGD Token</h2>
+    <iframe src="https://pancakeswap.finance/swap?outputCurrency=0x4751C0DE56EFB3770615097347cbF131D302498A" width="100%" height="400" style="border:none;"></iframe>
+  </section>
 
-    <section id="prediction">
-      <h2>Prediction Game</h2>
-      <label for="tokenSelect">Choose token:</label>
-      <select id="tokenSelect">
-        <option value="bitcoin">Bitcoin</option>
-        <option value="ethereum">Ethereum</option>
-        <option value="binancecoin">BNB</option>
-        <option value="legend">LGD</option>
+  <!-- بخش شرط بندی -->
+  <section id="bet-section">
+    <h2>Prediction Market</h2>
+    <p>Choose a token and predict whether its price will go UP or DOWN in the next 5 minutes</p>
+
+    <form id="bet-form">
+      <label>Choose Token:</label>
+      <select name="token">
+        <option value="BTCUSDT">Bitcoin (BTC)</option>
+        <option value="ETHUSDT">Ethereum (ETH)</option>
+        <option value="BNBUSDT">Binance Coin (BNB)</option>
+        <option value="LGD">Legend Token (LGD)</option>
       </select>
 
-      <label for="multiplier">Select Multiplier:</label>
-      <select id="multiplier">
-        <option value="1">x1 (min 10000 LGD)</option>
-        <option value="2">x2 (min 15000 LGD)</option>
-        <option value="3">x3 (min 20000 LGD)</option>
-        <option value="4">x4 (min 25000 LGD)</option>
-        <option value="5">x5 (min 30000 LGD)</option>
+      <label>Select Multiplier:</label>
+      <select name="multiplier">
+        <option value="1">x1 - Min: 10,000 LGD</option>
+        <option value="2">x2 - Min: 15,000 LGD</option>
+        <option value="3">x3 - Min: 20,000 LGD</option>
+        <option value="4">x4 - Min: 25,000 LGD</option>
+        <option value="5">x5 - Min: 30,000 LGD</option>
       </select>
 
-      <label for="direction">Prediction:</label>
-      <select id="direction">
-        <option value="up">Price Up</option>
-        <option value="down">Price Down</option>
+      <label>Direction:</label>
+      <select name="direction">
+        <option value="up">Up</option>
+        <option value="down">Down</option>
       </select>
 
-      <button id="placeBet">Place Prediction</button>
-      <div id="betStatus"></div>
-    </section>
+      <button type="submit">Place Bet</button>
+    </form>
 
-    <section id="leaderboard">
-      <h2>Top Players</h2>
-      <ul id="topPlayers">
-        <li>Loading...</li>
-      </ul>
-      <p id="countdown">Next reward in: 3 days</p>
-    </section>
+    <!-- نمایش نمودار کندل -->
+    <div id="chart">
+      <h3>Live Chart</h3>
+      <div id="tradingview-widget-container" style="height: 400px;"></div>
+    </div>
+  </section>
 
-    <section id="adminPanel" style="display:none;">
-      <h2>Admin Panel</h2>
-      <p>Welcome, owner! Manage platform settings here.</p>
-    </section>
-  </main>
+  <!-- رتبه بندی -->
+  <section id="leaderboard">
+    <h2>Top 10 Users</h2>
+    <ul id="leaderboard-list">
+      <li>Loading leaderboard...</li>
+    </ul>
+    <p id="countdown">Event ends in: 3 days</p>
+  </section>
 
-  <footer>
-    <p>&copy; 2025 Legend Token. All rights reserved.</p>
-  </footer>
+  <!-- پنل مدیریت (فقط برای مالک) -->
+  <section id="admin-panel" style="display:none;">
+    <h2>Admin Panel</h2>
+    <p>Total collected LGD: <span id="admin-balance">0</span></p>
+    <button onclick="withdraw()">Withdraw Earnings</button>
+  </section>
+
+  <script src="main.js"></script>
+
+  <!-- TradingView Widget Script -->
+  <script type="text/javascript">
+    function loadChart(symbol = 'BTCUSDT') {
+      document.getElementById('tradingview-widget-container').innerHTML = '';
+      new TradingView.widget({
+        "width": "100%",
+        "height": 400,
+        "symbol": "BINANCE:" + symbol,
+        "interval": "1",
+        "timezone": "Etc/UTC",
+        "theme": "light",
+        "style": "1",
+        "locale": "en",
+        "toolbar_bg": "#f1f3f6",
+        "enable_publishing": false,
+        "container_id": "tradingview-widget-container"
+      });
+    }
+
+    // بارگذاری اولیه نمودار
+    loadChart();
+    document.querySelector('[name="token"]').addEventListener('change', (e) => {
+      const selected = e.target.value;
+      loadChart(selected === 'LGD' ? 'BTCUSDT' : selected); // برای LGD پیش‌فرض
+    });
+  </script>
+
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 </body>
 </html>
