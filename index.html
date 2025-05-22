@@ -1,77 +1,144 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Legend Token DApp</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <meta charset="UTF-8">
+  <title>Legend Token Platform</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #111; color: #fff; }
+    .section { border: 1px solid #444; padding: 20px; margin: 20px 0; border-radius: 10px; background: #222; }
+    .admin-panel { display: none; }
+  </style>
 </head>
 <body>
-  <!-- معرفی توکن -->
-  <section id="intro">
-    <h1>Legend Token (LGD)</h1>
-    <p>قرارداد: <span id="contractAddress">0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842</span></p>
-    <p>شبکه: Binance Smart Chain</p>
-    <p>نماد: LGD</p>
-  </section>  <!-- اتصال کیف پول -->  <section id="wallet">
-    <h2>اتصال کیف پول</h2>
-    <button onclick="connectWallet()">اتصال کیف پول</button>
-    <p id="walletAddress">کیف پول متصل نشده</p>
-  </section>  <!-- خرید و فروش توکن -->  <section id="swap">
-    <h2>خرید و فروش توکن</h2>
-    <p>خرید از پنکیک‌سوآپ با 1٪ کارمزد به مالک</p>
-    <input type="number" id="amountToBuy" placeholder="مقدار BNB برای خرید" />
-    <button onclick="buyToken()">خرید LGD</button>
-    <input type="number" id="amountToSell" placeholder="مقدار LGD برای فروش" />
-    <button onclick="sellToken()">فروش LGD</button>
-  </section>  <!-- نرخ زنده توکن -->  <section id="live-price">
-    <h2>نرخ زنده</h2>
-    <div id="tokenPrices">
-      <p>: <span id="btcPrice">BTC</span></p>
-      <p>: <span id="ethPrice">ETH</span></p>
-      <p>: <span id="bnbPrice"></span>BNB</p>
-      <p>LGD: <span id="lgdPrice">LGD</span></p>
-    </div>
-  </section>  <!-- شرط بندی -->  <section id="bet">
-    <h2>شرط بندی روی توکن‌ها</h2>
-    <select id="tokenToBet">
+
+  <!-- 1. Token Info -->
+  <div class="section">
+    <h2>Token Info</h2>
+    <p><strong>Name:</strong> Legend Token</p>
+    <p><strong>Symbol:</strong> LGD</p>
+    <p><strong>Total Supply:</strong> 990,000,000</p>
+    <p><strong>Token Address:</strong> 0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842</p>
+  </div>
+
+  <!-- 2. Wallet Connection -->
+  <div class="section">
+    <h2>Connect Wallet</h2>
+    <button onclick="connectWallet()">Connect Wallet</button>
+    <p id="wallet-address"></p>
+  </div>
+
+  <!-- 3. Buy/Sell Token -->
+  <div class="section">
+    <h2>Buy/Sell LGD Token</h2>
+    <a href="https://pancakeswap.finance/swap?outputCurrency=0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842" target="_blank">Trade on PancakeSwap</a>
+  </div>
+
+  <!-- 4. Live Prices -->
+  <div class="section">
+    <h2>Live Token Prices</h2>
+    <p>BTC: <span id="btc-price">Loading...</span></p>
+    <p>ETH: <span id="eth-price">Loading...</span></p>
+    <p>BNB: <span id="bnb-price">Loading...</span></p>
+    <p>LGD: <span id="lgd-price">Loading...</span></p>
+  </div>
+
+  <!-- 5. Betting -->
+  <div class="section">
+    <h2>Betting</h2>
+    <label>Select Token:</label>
+    <select id="bet-token">
       <option value="BTC">BTC</option>
       <option value="ETH">ETH</option>
       <option value="BNB">BNB</option>
       <option value="LGD">LGD</option>
-    </select>
-    <label>مضرب ورود:</label>
-    <select id="multiplier">
-      <option value="1">1 (10000 LGD)</option>
-      <option value="2">2 (15000 LGD)</option>
-      <option value="3">3 (20000 LGD)</option>
-      <option value="4">4 (25000 LGD)</option>
-      <option value="5">5 (30000 LGD)</option>
-    </select>
-    <p>پیش‌بینی:</p>
-    <button onclick="placeBet('up')">بالا می‌رود</button>
-    <button onclick="placeBet('down')">پایین می‌آید</button>
-  </section>  <!-- لیست افراد برتر -->  <section id="leaderboard">
-    <h2>10 کاربر برتر</h2>
-    <ul id="topUsers"></ul>
-    <p>زمان باقی مانده تا پایان رویداد: <span id="countdown">3 روز</span></p>
-  </section>  <!-- پنل مدیریت -->  <section id="admin" style="display:none;">
-    <h2>پنل مدیریت</h2>
-    <p>امکان مشاهده لیست کاربران، امتیازات، و کنترل جایزه</p>
-  </section>  <script src="script.js"></script></body>
-  <section id="leaderboard" class="section">
-    <h2>جدول رتبه‌بندی کاربران</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>رتبه</th>
-          <th>آدرس کیف پول</th>
-          <th>امتیاز</th>
-        </tr>
-      </thead>
-      <tbody id="leaderboardBody">
-        <!-- داده‌ها به‌صورت داینامیک وارد می‌شوند -->
-      </tbody>
-    </table>
-  </section>
+    </select><br><br>
+    <label>Prediction:</label>
+    <select id="direction">
+      <option value="up">UP</option>
+      <option value="down">DOWN</option>
+    </select><br><br>
+    <label>Stake (min 10,000 LGD):</label>
+    <input type="number" id="stake" min="10000" step="10000"><br><br>
+    <button onclick="startBet()">Place Bet</button>
+    <div id="bet-result"></div>
+  </div>
+
+  <!-- 6. Leaderboard -->
+  <div class="section">
+    <h2>Top Users</h2>
+    <ol id="leaderboard">
+      <!-- Filled dynamically -->
+    </ol>
+    <p id="time-left">5 days remaining</p>
+  </div>
+
+  <!-- 7. Admin Panel -->
+  <div class="section admin-panel" id="admin-panel">
+    <h2>Admin Panel</h2>
+    <p>Total users: <span id="total-users">0</span></p>
+    <p>Total LGD collected: <span id="collected">0</span></p>
+    <button onclick="distributePrizes()">Distribute 5M LGD</button>
+  </div>
+
+  <script>
+    const ownerAddress = "0xec54951C7d4619256Ea01C811fFdFa01A9925683";
+    let userWallet = "";
+
+    async function connectWallet() {
+      if (window.ethereum) {
+        const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+        userWallet = accounts[0];
+        document.getElementById("wallet-address").innerText = "Connected: " + userWallet;
+        if (userWallet.toLowerCase() === ownerAddress.toLowerCase()) {
+          document.getElementById("admin-panel").style.display = "block";
+        }
+      } else {
+        alert("Install MetaMask!");
+      }
+    }
+
+    async function fetchPrices() {
+      try {
+        const res = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin&vs_currencies=usd');
+        document.getElementById("btc-price").innerText = "$" + res.data.bitcoin.usd;
+        document.getElementById("eth-price").innerText = "$" + res.data.ethereum.usd;
+        document.getElementById("bnb-price").innerText = "$" + res.data.binancecoin.usd;
+        document.getElementById("lgd-price").innerText = "$0.01 (fixed)";
+      } catch {
+        document.getElementById("btc-price").innerText = "Error";
+      }
+    }
+
+    fetchPrices();
+    setInterval(fetchPrices, 10000);
+
+    async function startBet() {
+      const token = document.getElementById("bet-token").value;
+      const direction = document.getElementById("direction").value;
+      const amount = parseInt(document.getElementById("stake").value);
+      if (amount < 10000) {
+        alert("Minimum stake is 10,000 LGD");
+        return;
+      }
+
+      // Simulate a win/loss after 1 minute
+      document.getElementById("bet-result").innerText = "Waiting 1 minute for result...";
+      setTimeout(() => {
+        const win = Math.random() > 0.5;
+        if (win) {
+          document.getElementById("bet-result").innerText = You won! +${amount / 10000} points. LGD returned minus 1% fee.;
+        } else {
+          document.getElementById("bet-result").innerText = You lost! Your LGD sent to owner's wallet.;
+        }
+      }, 60000);
+    }
+
+    function distributePrizes() {
+      alert("5,000,000 LGD distributed to top user!");
+    }
+  </script>
+
+</body>
 </html>
