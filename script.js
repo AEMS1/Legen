@@ -79,7 +79,7 @@ async function placeBet() {
 async function updatePrices() {
   document.getElementById("btcPrice").innerText = "BTC: 0" ;
   document.getElementById("ethPrice").innerText =  "ETH: 0" ;
-  document.getElementById("bnbPrice").innerText = "BNB: 122" ;
+  document.getElementById("bnbPrice").innerText = "BNB: 0" ;
   document.getElementById("legendPrice").innerText = "LGD: $0.02" ;
 }
 
