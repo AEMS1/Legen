@@ -2,76 +2,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Legend Token Platform</title>
+  <title>Legend Token Betting</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
   <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
   <header>
     <h1>Legend Token Platform</h1>
-    <p>Buy, Sell, and Bet on Token Prices</p>
-    <button onclick="connectWallet()">Connect Wallet</button>
-    <p id="wallet-address"></p>
-  </header>  <main class="container">
-    <!-- 1. Token Info -->
-    <section>
-      <h2>Token Information</h2>
-      <p><strong>Name:</strong> Legend Token</p>
-      <p><strong>Symbol:</strong> LGD</p>
-      <p><strong>Token Address:</strong> 0x75DaF5e1401a7fE3F1c31a364b62a41Cb9eCf842</p>
-      <p><strong>Live Price:</strong> <span id="lgd-price">Loading...</span></p>
-    </section><!-- 2. Short Bet Section -->
-<section>
-  <h2>Short Betting</h2>
-  <label>Select Token:</label>
-  <select id="bet-token" onchange="updateChart()">
-    <option value="BTCUSDT">Bitcoin (BTC)</option>
-    <option value="ETHUSDT">Ethereum (ETH)</option>
-    <option value="BNBUSDT">Binance Coin (BNB)</option>
-    <option value="LGD">Legend Token (LGD)</option>
-  </select>
+    <button id="connectWalletBtn">Connect Wallet</button>
+  </header>  <section id="tokenIntro">
+    <h2>About Legend (LGD)</h2>
+    <p id="tokenDescription">Legend is a utility token listed on PancakeSwap and CoinMarketCap.</p>
+    <span id="livePrice">Loading price...</span>
+  </section>  <section id="betSection">
+    <h2>Place Your Short Bet</h2>
+    <label for="tokenSelect">Select Token:</label>
+    <select id="tokenSelect">
+      <option value="BTC">Bitcoin (BTC)</option>
+      <option value="ETH">Ethereum (ETH)</option>
+      <option value="BNB">Binance Coin (BNB)</option>
+      <option value="LGD">Legend (LGD)</option>
+    </select><div id="chartContainer" style="height:400px;"></div>
 
-  <div id="chart-container"></div>
+<label for="multiplier">Select Multiplier:</label>
+<select id="multiplier">
+  <option value="1">x1 (10,000 LGD)</option>
+  <option value="2">x2 (20,000 LGD)</option>
+  <option value="3">x3 (30,000 LGD)</option>
+  <option value="4">x4 (40,000 LGD)</option>
+  <option value="5">x5 (50,000 LGD)</option>
+</select>
 
-  <label>Choose Direction:</label>
-  <select id="bet-direction">
-    <option value="up">Price Will Go Up</option>
-    <option value="down">Price Will Go Down</option>
-  </select>
+<label>Choose Direction:</label>
+<button class="direction" data-dir="up">UP</button>
+<button class="direction" data-dir="down">DOWN</button>
 
-  <label>Choose Multiplier:</label>
-  <select id="bet-multiplier" onchange="setAmount()">
-    <option value="1">1x (10,000 LGD)</option>
-    <option value="2">2x (20,000 LGD)</option>
-    <option value="3">3x (30,000 LGD)</option>
-    <option value="4">4x (40,000 LGD)</option>
-    <option value="5">5x (50,000 LGD)</option>
-  </select>
+<button id="placeBetBtn">Place Bet</button>
 
-  <label>Amount (auto-filled):</label>
-  <input type="number" id="bet-amount" readonly>
-
-  <button onclick="placeBet()">Place Bet</button>
-  <p id="bet-status"></p>
-</section>
-
-<!-- 3. Leaderboard -->
-<section>
-  <h2>Top Users</h2>
-  <ul id="leaderboard" class="top-users"></ul>
-</section>
-
-<!-- 4. LGD Trading -->
-<section>
-  <h2>Trade Legend Token</h2>
-  <label>Amount to Buy/Sell:</label>
-  <input type="number" id="trade-amount">
-  <button onclick="buyLGD()">Buy LGD</button>
-  <button onclick="sellLGD()">Sell LGD</button>
-  <p id="trade-status"></p>
-</section>
-
-  </main>  <script src="script.js"></script></body>
+  </section>  <section id="leaderboard">
+    <h2>Top 10 Players (Updated Weekly)</h2>
+    <ol id="topPlayersList"></ol>
+    <p>Winner gets: 1,500,000 LGD (manually sent)</p>
+  </section>  <section id="exchange">
+    <h2>Trade LGD Token</h2>
+    <p>Current Price: <span id="lgdPrice">Loading...</span></p>
+    <button id="buyLGD">Buy</button>
+    <button id="sellLGD">Sell</button>
+  </section>  <section id="adminPanel" style="display:none;">
+    <h2>Admin Panel</h2>
+    <textarea id="editDescription" rows="5"></textarea>
+    <button id="saveDescription">Save Description</button>
+    <button id="resetLeaderboard">Reset Leaderboard</button>
+  </section>  <script src="app.js"></script></body>
 </html>
