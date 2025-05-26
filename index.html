@@ -2,31 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LGD Space Battle</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LGD Battle Game</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>LGD Space Battle</h1>
-    <button id="connectBtn">Connect Wallet</button>
-    
-    <div id="walletInfo" style="display:none;">
-      <p><strong>Wallet:</strong> <span id="walletAddress"></span></p>
-      <p><strong>LGD Balance:</strong> <span id="lgdBalance">0</span></p>
-      <button id="enterGame">Enter Game (10,000 LGD)</button>
-    </div>
+  <div id="wallet-section">
+    <button id="connectWallet">Connect Wallet</button>
+    <p id="walletAddress">Not connected</p>
+  </div>
 
-    <canvas id="gameCanvas" width="400" height="300"></canvas>
-
-    <div id="mobileControls">
-      <button id="leftBtn">←</button>
+  <div id="game-area">
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <div id="mobile-controls">
+      <button id="leftBtn">Left</button>
       <button id="shootBtn">Shoot</button>
-      <button id="rightBtn">→</button>
+      <button id="rightBtn">Right</button>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
+  <script>
+    let provider;
+    let signer;
+
+    document.getElementById("connectWallet").onclick = async () => {
+      if (window.ethereum) {
+        try {
+          provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+          await provider.send("eth_requestAccounts", []);
+          signer = provider.getSigner();
+
+          const address = await signer.getAddress();
+          document.getElementById("walletAddress").textContent = "Connected: " + address;
+        } catch (err) {
+          console.error("Connection Error:", err);
+        }
+      } else {
+        alert("Please install MetaMask!");
+      }
+    };
+  </script>
+
   <script src="main.js"></script>
 </body>
 </html>
