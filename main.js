@@ -1,113 +1,47 @@
-let provider;
-let signer;
-let playerAddress;
-const LGD_TOKEN = "0x4751C0DE56EFB3770615097347cbF131D302498A";
-const GAME_ENTRY = ethers.utils.parseUnits("10000", 18);
-const GAME_WALLET = "0xeD2952010b50480F4Cc5829d8e29A1E499f30c74";
-const ABI = [
-  "function balanceOf(address) view returns (uint256)",
-  "function transfer(address to, uint256 amount) returns (bool)"
-];
+let canvas, ctx; let player = { x: 150, y: 280, width: 20, height: 20, color: 'lime', lives: 3 }; let bullets = []; let enemy = { x: 150, y: 10, width: 20, height: 20, color: 'red', direction: 2 }; let enemyBullets = []; let gameRunning = false; let walletAddress = null;
 
-const connectBtn = document.getElementById("connectBtn");
-const walletInfo = document.getElementById("walletInfo");
-const walletAddressEl = document.getElementById("walletAddress");
-const lgdBalanceEl = document.getElementById("lgdBalance");
-const enterGameBtn = document.getElementById("enterGame");
+window.onload = () => { canvas = document.getElementById('gameCanvas'); ctx = canvas.getContext('2d'); resizeCanvas(); drawStartScreen(); };
 
-connectBtn.onclick = async () => {
-  if (!window.ethereum) return alert("Install MetaMask or compatible wallet.");
-  provider = new ethers.providers.Web3Provider(window.ethereum);
-  await provider.send("eth_requestAccounts", []);
-  signer = provider.getSigner();
-  playerAddress = await signer.getAddress();
-  walletInfo.style.display = "block";
-  walletAddressEl.textContent = playerAddress;
+function resizeCanvas() { canvas.width = 320; canvas.height = 300; }
 
-  const lgd = new ethers.Contract(LGD_TOKEN, ABI, provider);
-  const balance = await lgd.balanceOf(playerAddress);
-  lgdBalanceEl.textContent = ethers.utils.formatUnits(balance, 18);
-};
+function drawStartScreen() { ctx.fillStyle = 'black'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = 'white'; ctx.font = '18px Arial'; ctx.fillText('Connect Wallet to Start', 50, 150); }
 
-enterGameBtn.onclick = async () => {
-  const lgd = new ethers.Contract(LGD_TOKEN, ABI, signer);
-  const tx = await lgd.transfer(GAME_WALLET, GAME_ENTRY);
-  await tx.wait();
-  alert("Entry paid. Game starting...");
-  startGame();
-};
+async function connectWallet() { if (window.ethereum) { try { const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' }); walletAddress = accounts[0]; document.getElementById('walletAddress').textContent = Wallet: ${walletAddress}; startGame(); } catch (error) { alert('Connection failed.'); } } else { alert('MetaMask not found!'); } }
 
-// Game logic
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+document.getElementById('connectWalletBtn').addEventListener('click', connectWallet);
 
-let player = { x: 175, y: 280, lives: 3, bullets: [] };
-let enemy = { x: 175, y: 20, bullets: [], isBot: true };
-let keys = {};
+document.getElementById('leftBtn').onclick = () => movePlayer(-10); document.getElementById('rightBtn').onclick = () => movePlayer(10); document.getElementById('shootBtn').onclick = shoot;
 
-function startGame() {
-  document.addEventListener("keydown", e => keys[e.key] = true);
-  document.addEventListener("keyup", e => keys[e.key] = false);
+document.addEventListener('keydown', e => { if (!gameRunning) return; if (e.key === 'ArrowLeft') movePlayer(-10); if (e.key === 'ArrowRight') movePlayer(10); if (e.key === ' ') shoot(); });
 
-  document.getElementById("leftBtn").onclick = () => keys["ArrowLeft"] = true;
-  document.getElementById("rightBtn").onclick = () => keys["ArrowRight"] = true;
-  document.getElementById("shootBtn").onclick = shoot;
+function startGame() { player.x = 150; player.lives = 3; bullets = []; enemyBullets = []; gameRunning = true; requestAnimationFrame(gameLoop); }
 
-  setInterval(updateGame, 50);
-  setInterval(enemyAI, 500);
-}
+function gameLoop() { update(); draw(); if (gameRunning) requestAnimationFrame(gameLoop); }
 
-function shoot() {
-  player.bullets.push({ x: player.x + 10, y: player.y });
-}
+function update() { bullets.forEach(b => b.y -= 5); bullets = bullets.filter(b => b.y > 0);
 
-function enemyAI() {
-  if (Math.random() < 0.9) {
-    if (enemy.x < player.x) enemy.x += 10;
-    else if (enemy.x > player.x) enemy.x -= 10;
-  }
-  if (Math.random() < 0.3) enemy.bullets.push({ x: enemy.x + 10, y: enemy.y + 10 });
-}
+enemy.x += enemy.direction; if (enemy.x < 0 || enemy.x > canvas.width - enemy.width) enemy.direction *= -1;
 
-function updateGame() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+if (Math.random() < 0.02) { enemyBullets.push({ x: enemy.x + 10, y: enemy.y + 20, width: 4, height: 10 }); }
 
-  // Move player
-  if (keys["ArrowLeft"]) player.x -= 5;
-  if (keys["ArrowRight"]) player.x += 5;
+enemyBullets.forEach(b => b.y += 5);
 
-  // Draw player & enemy
-  ctx.fillStyle = "lime";
-  ctx.fillRect(player.x, player.y, 20, 20);
-  ctx.fillStyle = "red";
-  ctx.fillRect(enemy.x, enemy.y, 20, 20);
+bullets.forEach(b => { if (b.x < enemy.x + enemy.width && b.x + b.width > enemy.x && b.y < enemy.y + enemy.height && b.y + b.height > enemy.y) { enemy.x = Math.random() * (canvas.width - enemy.width); bullets = bullets.filter(x => x !== b); } });
 
-  // Player bullets
-  player.bullets.forEach((b, i) => {
-    b.y -= 5;
-    ctx.fillRect(b.x, b.y, 5, 10);
-    if (b.y < 0) player.bullets.splice(i, 1);
-    if (b.x > enemy.x && b.x < enemy.x + 20 && b.y < enemy.y + 20) {
-      alert("You win! Reward will be handled.");
-      location.reload();
-    }
-  });
+enemyBullets.forEach(b => { if (b.x < player.x + player.width && b.x + b.width > player.x && b.y < player.y + player.height && b.y + b.height > player.y) { player.lives--; enemyBullets = enemyBullets.filter(x => x !== b); if (player.lives <= 0) gameOver(); } }); }
 
-  // Enemy bullets
-  enemy.bullets.forEach((b, i) => {
-    b.y += 5;
-    ctx.fillRect(b.x, b.y, 5, 10);
-    if (b.y > canvas.height) enemy.bullets.splice(i, 1);
-    if (b.x > player.x && b.x < player.x + 20 && b.y > player.y) {
-      player.lives--;
-      enemy.bullets.splice(i, 1);
-      if (player.lives <= 0) {
-        alert("Game Over!");
-        location.reload();
-      }
-    }
-  });
+function draw() { ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  keys["ArrowLeft"] = false;
-  keys["ArrowRight"] = false;
-}
+ctx.fillStyle = player.color; ctx.fillRect(player.x, player.y, player.width, player.height);
+
+ctx.fillStyle = enemy.color; ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+
+ctx.fillStyle = 'white'; bullets.forEach(b => ctx.fillRect(b.x, b.y, b.width, b.height)); enemyBullets.forEach(b => ctx.fillRect(b.x, b.y, b.width, b.height));
+
+ctx.fillStyle = 'red'; for (let i = 0; i < player.lives; i++) { ctx.fillRect(10 + i * 25, canvas.height - 20, 20, 10); } }
+
+function movePlayer(dir) { player.x += dir; player.x = Math.max(0, Math.min(canvas.width - player.width, player.x)); }
+
+function shoot() { bullets.push({ x: player.x + 8, y: player.y, width: 4, height: 10 }); }
+
+function gameOver() { gameRunning = false; ctx.fillStyle = 'white'; ctx.font = '20px Arial'; ctx.fillText('Game Over', 100, 150); }
