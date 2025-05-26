@@ -8,17 +8,36 @@
     #status { text-align: center; color: white; font-family: sans-serif; margin: 10px; }
     button { display: block; margin: 10px auto; padding: 10px 20px; }
   </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body onload="initGame();">
   <div id="status">Welcome! Create your wallet and enter the battle.</div>
   <button onclick="createWallet()">Create Wallet</button>
   <button onclick="enterGame()">Enter Battle (10,000 LGD)</button>
   <canvas id="gameCanvas" width="400" height="600"></canvas>
+  <div style="text-align: center; margin-top: 10px;">
+    <button onclick="moveLeft()">◀️</button>
+    <button onclick="shootPlayer()">🔫</button>
+    <button onclick="moveRight()">▶️</button>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
   <script src="abi.js"></script>
   <script src="wallet.js"></script>
   <script src="game.js"></script>
   <script src="battle.js"></script> <!-- فایل گرافیک بازی اینجاست -->
+  <script>
+    function moveLeft() {
+      player.x -= 10;
+    }
+  
+    function moveRight() {
+      player.x += 10;
+    }
+  
+    function shootPlayer() {
+      shoot(player.bullets, player.x + 10, player.y);
+    }
+  </script>
 </body>
 </html>
