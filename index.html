@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LGD Battle Game</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <h1>LGD Battle Game</h1>
+
+  <div id="walletSection">
+    <h2>My Wallet</h2>
+    <p>Your Private Key (Keep it safe!):</p>
+    <textarea id="privateKey" rows="3" readonly></textarea>
+    <p>LGD Balance: <span id="lgdBalance">0</span></p>
+    <p>BNB Balance: <span id="bnbBalance">0</span></p>
+    <button id="withdrawBtn">Withdraw LGD</button>
+    <p>To Deposit LGD, send tokens to: <br />
+      <b>0x4751C0DE56EFB3770615097347cbF131D302498A</b>
+    </p>
+  </div>
+
+  <div id="entry">
+    <button id="startGameBtn">Enter Game (10,000 LGD Entry Fee)</button>
+    <p id="statusMsg"></p>
+  </div>
+
+  <canvas id="gameCanvas" width="480" height="640"></canvas>
+
+  <!-- موبایل: دکمه‌های کنترل -->
+  <div id="mobileControls" style="display:none; text-align:center; margin-top:10px;">
+    <button id="btnLeft">Left</button>
+    <button id="btnShoot">Shoot</button>
+    <button id="btnRight">Right</button>
+  </div>
+
+  <script src="abi.js"></script>
+  <script src="wallet.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
