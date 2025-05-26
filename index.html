@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LGD Wallet Connect</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; background: #121212; color: #eee; }
+  button { padding: 10px 20px; margin: 10px 0; background: #1e88e5; border: none; color: white; cursor: pointer; }
+  button:disabled { background: #555; cursor: not-allowed; }
+  input, select { padding: 8px; margin: 5px 0; width: 100%; }
+  .container { max-width: 400px; margin: auto; background: #222; padding: 20px; border-radius: 8px; }
+  label { display: block; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Connect Your Wallet</h2>
+  <button id="connectButton">Connect MetaMask</button>
+  
+  <div id="walletInfo" style="display:none;">
+    <p><strong>Address:</strong> <span id="walletAddress"></span></p>
+    <p><strong>BNB Balance:</strong> <span id="bnbBalance">-</span></p>
+    <p><strong>LGD Balance:</strong> <span id="lgdBalance">-</span></p>
+  </div>
+
+  <hr/>
+
+  <h3>Send Tokens</h3>
+  <form id="sendForm">
+    <label for="tokenSelect">Token:</label>
+    <select id="tokenSelect">
+      <option value="bnb">BNB</option>
+      <option value="lgd">LGD</option>
+    </select>
+
+    <label for="recipient">Recipient Address:</label>
+    <input type="text" id="recipient" placeholder="0x..." required />
+
+    <label for="amount">Amount:</label>
+    <input type="number" id="amount" placeholder="0.0" step="any" min="0" required />
+
+    <button type="submit">Send</button>
+  </form>
+
+  <p id="status"></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+<script src="main.js"></script>
+
+</body>
+</html>
