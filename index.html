@@ -1,37 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>LGD Space Battle Game</title>
-<link rel="stylesheet" href="style.css" />
-<script src="https://unpkg.com/ethers/dist/ethers.min.js"></script>
-<script src="https://unpkg.com/web3modal@1.9.0/dist/index.js"></script>
-<script src="https://unpkg.com/@walletconnect/web3-provider@1.6.6/dist/umd/index.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LGD Space Battle</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>LGD Space Battle</h1>
-      <button id="connectWalletBtn">Connect Wallet</button>
-      <div id="walletInfo" style="display:none;">
-        <p>Connected: <span id="walletAddress"></span></p>
-        <p>LGD Token Balance: <span id="tokenBalance">0</span></p>
-        <button id="enterGameBtn" disabled>Enter Game (10000 LGD)</button>
-      </div>
-      <p id="statusMsg"></p>
-    </header>
-
-    <main>
-      <canvas id="gameCanvas" width="480" height="320"></canvas>
-      <div id="mobileControls" style="display:none;">
-        <button id="btnLeft">Left</button>
-        <button id="btnShoot">Shoot</button>
-        <button id="btnRight">Right</button>
-      </div>
-    </main>
-  </div>
-
-  <script src="main.js"></script>
-</body>
+    <h1>LGD Space Battle</h1>
+    <button id="connectBtn">Connect Wallet</button>
+    <div id="walletInfo" style="display: none;">
+      <p>Wallet: <span id="walletAddress"></span></p>
+      <p>LGD Balance: <span id="lgdBalance"></span></p>
+      <button id="enterGame">Enter Game (10000 LGD)</button>
+    </div>
+    <canvas id="gameCanvas" width="400" height="300"></canvas>
+    <div id="mobileControls">
+      <button id="leftBtn">Left</button>
+      <button id="shootBtn">Shoot</button>
+      <button id="rightBtn">Right</button>
+    </div>
+  </div>  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>  <script src="main.js"></script></body>
 </html>
