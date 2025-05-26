@@ -1,7 +1,8 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LGD Space Battle</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -9,16 +10,23 @@
   <div class="container">
     <h1>LGD Space Battle</h1>
     <button id="connectBtn">Connect Wallet</button>
-    <div id="walletInfo" style="display: none;">
-      <p>Wallet: <span id="walletAddress"></span></p>
-      <p>LGD Balance: <span id="lgdBalance"></span></p>
-      <button id="enterGame">Enter Game (10000 LGD)</button>
+    
+    <div id="walletInfo" style="display:none;">
+      <p><strong>Wallet:</strong> <span id="walletAddress"></span></p>
+      <p><strong>LGD Balance:</strong> <span id="lgdBalance">0</span></p>
+      <button id="enterGame">Enter Game (10,000 LGD)</button>
     </div>
+
     <canvas id="gameCanvas" width="400" height="300"></canvas>
+
     <div id="mobileControls">
-      <button id="leftBtn">Left</button>
+      <button id="leftBtn">←</button>
       <button id="shootBtn">Shoot</button>
-      <button id="rightBtn">Right</button>
+      <button id="rightBtn">→</button>
     </div>
-  </div>  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>  <script src="main.js"></script></body>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
+  <script src="main.js"></script>
+</body>
 </html>
