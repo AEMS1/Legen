@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Auction</title>
+  <link rel="stylesheet" href="css/style1.css">
+</head>
+<header>
+  <nav><a href="auction.html" class="active">Auction</a><a href="index.html">Swap</a><a href="admin.html"></a></nav>
+  <div id="wallet-address"></div>
+  <button onclick="connectWallet()">Connect Wallet</button></div>
+</header>
+<main>
+
+<body>
+  <h1>🚀 Auction Page</h1>
+
+  <div id="accessSection">
+    <p>To participate in the auction, you must pay <span id="entryFeeText">...</span> AMS</p>
+    <button onclick="buyAccess()">Pay Entry Fee</button>
+  </div>
+
+  <div id="auction30Section" style="display:none">
+    <h2>30-Day Auction</h2>
+    <p>Reward: <span id="reward30">...</span> AMS</p>
+    <p>Ends in: <span id="timer30"></span></p>
+    <p>Min BNB: <span id="minBNB30"></span></p>
+    <input type="number" id="bidAmount30" placeholder="Enter BNB amount" />
+    <button onclick="bidAuction(30)">Submit Bid</button>
+    <ul id="leaderboard30"></ul>
+  </div>
+
+  <div id="auction60Section" style="display:none">
+    <h2>60-Day Auction</h2>
+    <p>Reward: <span id="reward60">...</span> AMS</p>
+    <p>Ends in: <span id="timer60"></span></p>
+    <p>Min BNB: <span id="minBNB60"></span></p>
+    <input type="number" id="bidAmount60" placeholder="Enter BNB amount" />
+    <button onclick="bidAuction(60)">Submit Bid</button>
+    <ul id="leaderboard60"></ul>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="js/abi.js"></script>
+  <script src="js/auction.js"></script>
+</body>
+</html>
