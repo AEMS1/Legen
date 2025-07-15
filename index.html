@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>بخش مزایده VIP</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #eee; text-align: center; padding: 20px; }
+    button { padding: 10px 20px; font-size: 16px; margin: 10px; }
+    .hidden { display: none; }
+    #auctionArea { margin-top: 30px; }
+    table { width: 100%; max-width: 500px; margin: 10px auto; border-collapse: collapse; }
+    th, td { border: 1px solid #444; padding: 8px; }
+  </style>
+</head>
+<body>
+  <h1>🎯 بخش مزایده VIP</h1>
+  <p id="wallet"></p>
+  <button onclick="connect()">اتصال کیف پول</button>
+  <div id="vipArea" class="hidden">
+    <p>برای دسترسی به مزایده باید VIP باشید.</p>
+    <button onclick="buyVIP()">خرید VIP (حدود 1 دلار)</button>
+  </div>
+  <div id="auctionArea" class="hidden">
+    <h2>✅ شما VIP هستید</h2>
+
+    <div>
+      <h3>مزایده 30 روزه 🎁</h3>
+      <p>جایزه: 10000 توکن</p>
+      <input id="bid30" type="number" placeholder="مقدار BNB">
+      <button onclick="placeBid30()">شرکت در مزایده 30 روزه</button>
+      <div>
+        <h4>لیست شرکت‌کننده‌ها</h4>
+        <div id="list30"></div>
+      </div>
+    </div>
+
+    <hr>
+
+    <div>
+      <h3>مزایده 60 روزه 🎁</h3>
+      <p>جایزه: 30000 توکن</p>
+      <input id="bid60" type="number" placeholder="مقدار BNB">
+      <button onclick="placeBid60()">شرکت در مزایده 60 روزه</button>
+      <div>
+        <h4>لیست شرکت‌کننده‌ها</h4>
+        <div id="list60"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let web3, contract;
+    const contractAddress = "0x81811cf143ee0db0f31508640b5ab164efbc353a";
+    const abi = [
+  {
+    "inputs": [],
+    "name": "buyVIP",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint8", "name": "auctionId", "type": "uint8" }
+    ],
+    "name": "joinAuction",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "user", "type": "address" }],
+    "name": "isVIP",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getVIPExpireTime",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint8", "name": "auctionId", "type": "uint8" }],
+    "name": "getAuctionData",
+    "outputs": [
+      { "internalType": "uint256", "name": "endTime", "type": "uint256" },
+      { "internalType": "uint256", "name": "rewardAmount", "type": "uint256" },
+      { "internalType": "address[]", "name": "users", "type": "address[]" },
+      { "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint8", "name": "auctionId", "type": "uint8" },
+      { "internalType": "uint256", "name": "reward", "type": "uint256" }
+    ],
+    "name": "setAuctionReward",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_vipPrice", "type": "uint256" }],
+    "name": "setVIPPrice",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint8", "name": "auctionId", "type": "uint8" }],
+    "name": "resetAuction",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]; // اینجا ABI قرارداد را قرار بده
+
+    async function connect() {
+      if (window.ethereum) {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        web3 = new Web3(window.ethereum);
+        const accounts = await web3.eth.getAccounts();
+        contract = new web3.eth.Contract(abi, contractAddress);
+        document.getElementById("wallet").innerText = `کیف پول: ${accounts[0]}`;
+        checkVIP();
+      } else {
+        alert("لطفاً MetaMask نصب کنید.");
+      }
+    }
+
+    async function checkVIP() {
+      const user = (await web3.eth.getAccounts())[0];
+      const exp = await contract.methods.vipExpiry(user).call();
+      const now = Math.floor(Date.now() / 1000);
+      if (exp > now) {
+        document.getElementById("vipArea").classList.add("hidden");
+        document.getElementById("auctionArea").classList.remove("hidden");
+        loadBids();
+      } else {
+        document.getElementById("vipArea").classList.remove("hidden");
+      }
+    }
+
+    async function buyVIP() {
+      const user = (await web3.eth.getAccounts())[0];
+      const price = await contract.methods.vipPrice().call();
+      await contract.methods.buyVIP().send({ from: user, value: price });
+      alert("خرید VIP موفق بود!");
+      checkVIP();
+    }
+
+    async function placeBid30() {
+      const user = (await web3.eth.getAccounts())[0];
+      const val = web3.utils.toWei(document.getElementById("bid30").value, "ether");
+      await contract.methods.placeBid30().send({ from: user, value: val });
+      loadBids();
+    }
+
+    async function placeBid60() {
+      const user = (await web3.eth.getAccounts())[0];
+      const val = web3.utils.toWei(document.getElementById("bid60").value, "ether");
+      await contract.methods.placeBid60().send({ from: user, value: val });
+      loadBids();
+    }
+
+    async function loadBids() {
+      const bids30 = await contract.methods.getBids30().call();
+      const bids60 = await contract.methods.getBids60().call();
+
+      document.getElementById("list30").innerHTML = bids30.map(b => `${b.bidder} ➤ ${web3.utils.fromWei(b.amount)} BNB`).join("<br>");
+      document.getElementById("list60").innerHTML = bids60.map(b => `${b.bidder} ➤ ${web3.utils.fromWei(b.amount)} BNB`).join("<br>");
+    }
+  </script>
+</body>
+</html>
