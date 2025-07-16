@@ -1,168 +1,62 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-  <meta charset="UTF-8">
-  <title>مدیریت مزایده</title>
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <meta charset="UTF-8" />
+  <title>صفحه مزایده</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
   <style>
-    body { font-family: sans-serif; direction: rtl; background: #f3f3f3; padding: 20px; }
-    .box { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
-    .admin-only { border: 2px dashed red; margin-top: 20px; padding: 15px; }
-    button { padding: 8px 15px; margin-top: 10px; }
-    input { padding: 5px; margin: 5px 0; width: 100%; }
+    body { font-family: sans-serif; background: #f7f7f7; padding: 20px; }
+    .vip-box, .auction-box { background: white; padding: 20px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    button { padding: 10px 20px; border: none; background: #0088ff; color: white; border-radius: 8px; cursor: pointer; }
+    button:disabled { background: #aaa; }
+    .participant { margin: 5px 0; }
+    .reward-box { margin-top: 10px; background: #e6f7ff; padding: 10px; border-radius: 8px; }
   </style>
 </head>
 <body>
-  <h2>🎯 مدیریت مزایده پیشرفته</h2>
-  <button onclick="connectWallet()">اتصال کیف پول 🔌</button>
-  <p id="wallet">کیف پول: متصل نیست</p>
 
-  <div class="box">
-    <p id="vipStatus">🔒 وضعیت VIP شما: بررسی نشده</p>
-    <button onclick="buyVIP()">خرید VIP (1 دلار BNB)</button>
+  <h1>🎯 ورود به مزایده</h1>
+
+  <!-- دکمه اتصال کیف پول -->
+  <button onclick="connectWallet()">اتصال کیف پول</button>
+  <p>آدرس: <span id="walletAddress">❌</span></p>
+
+  <!-- باکس خرید VIP -->
+  <div class="vip-box" id="vipBox">
+    <h3>برای ورود به مزایده باید VIP بخرید (1 دلار)</h3>
+    <button onclick="buyVIP()">پرداخت و فعال‌سازی VIP</button>
+    <p id="vipStatus">وضعیت VIP: ❌</p>
   </div>
 
-  <div class="box" id="auctionSection" style="display:none;">
-    <h3>🔥 مزایده‌ها</h3>
+  <!-- پنل مزایده -->
+  <div class="auction-box" id="auctionPanel" style="display:none;">
+    <h2>🪙 لیست مزایده‌ها</h2>
 
-    <div>
-      <h4>مزایده 30 روزه</h4>
-      <p>🎁 جایزه: <span id="reward30">---</span> توکن</p>
-      <p>⏳ زمان باقی‌مانده: <span id="time30">--</span></p>
-      <input type="number" id="bidAmount30" placeholder="مقدار BNB">
-      <button onclick="bidAuction(1, 'bidAmount30')">شرکت در مزایده</button>
-      <ul id="list30"></ul>
+    <!-- مزایده 30 روزه -->
+    <div id="auction30">
+      <h3>🎁 مزایده 30 روزه</h3>
+      <p>جایزه: <span id="reward30">10,000 LGD</span></p>
+      <input type="number" id="amount30" placeholder="مقدار پیشنهادی (BNB)" />
+      <button onclick="enterAuction(30)">شرکت در مزایده</button>
+      <div id="list30"></div>
     </div>
 
-    <div style="margin-top:20px">
-      <h4>مزایده 60 روزه</h4>
-      <p>🎁 جایزه: <span id="reward60">---</span> توکن</p>
-      <p>⏳ زمان باقی‌مانده: <span id="time60">--</span></p>
-      <input type="number" id="bidAmount60" placeholder="مقدار BNB">
-      <button onclick="bidAuction(2, 'bidAmount60')">شرکت در مزایده</button>
-      <ul id="list60"></ul>
+    <hr />
+
+    <!-- مزایده 60 روزه -->
+    <div id="auction60">
+      <h3>🎁 مزایده 60 روزه</h3>
+      <p>جایزه: <span id="reward60">30,000 LGD</span></p>
+      <input type="number" id="amount60" placeholder="مقدار پیشنهادی (BNB)" />
+      <button onclick="enterAuction(60)">شرکت در مزایده</button>
+      <div id="list60"></div>
     </div>
+
+    <hr />
+    <!-- دکمه مدیریت (فقط برای مالک) -->
+    <button onclick="resetAuctions()">🔁 ریست مزایده‌ها</button>
   </div>
 
-  <div class="admin-only" id="adminSection" style="display:none">
-    <h3>🔧 تنظیمات مدیر</h3>
-    <p>تغییر جایزه‌ها</p>
-    <label>جایزه 30 روزه:</label>
-    <input id="setReward30" type="number">
-    <label>جایزه 60 روزه:</label>
-    <input id="setReward60" type="number">
-    <button onclick="updateRewards()">بروزرسانی جوایز</button>
-  </div>
-
-<script>
-const contractAddress = "0x81811cf143ee0db0f31508640b5ab164efbc353a";
-const ownerAddress = "0xec54951C7d4619256Ea01C811fFdFa01A9925683"; // تغییر بده در صورت نیاز
-let account, web3, contract;
-
-const abi = [
-  { "inputs":[],"name":"buyVIP","outputs":[],"stateMutability":"payable","type":"function" },
-  { "inputs":[{"internalType":"uint8","name":"typeId","type":"uint8"}],"name":"bidAuction","outputs":[],"stateMutability":"payable","type":"function" },
-  { "inputs":[],"name":"isVIP","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function" },
-  { "inputs":[{"internalType":"uint8","name":"typeId","type":"uint8"}],"name":"getAuctionList","outputs":[{"internalType":"address[]","name":"addrs","type":"address[]"},{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"view","type":"function" },
-  { "inputs":[],"name":"reward30","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function" },
-  { "inputs":[],"name":"reward60","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function" },
-  { "inputs":[{"internalType":"uint256","name":"r30","type":"uint256"},{"internalType":"uint256","name":"r60","type":"uint256"}],"name":"setRewards","outputs":[],"stateMutability":"nonpayable","type":"function" }
-];
-
-async function connectWallet() {
-  if (!window.ethereum) return alert("Metamask نصب نیست");
-  web3 = new Web3(window.ethereum);
-  await window.ethereum.request({ method: 'eth_requestAccounts' });
-  const accounts = await web3.eth.getAccounts();
-  account = accounts[0];
-  contract = new web3.eth.Contract(abi, contractAddress);
-  document.getElementById("wallet").innerText = "کیف پول: " + account;
-  checkVIP();
-  checkAdmin();
-  loadRewards();
-  updateTimers();
-  setInterval(updateTimers, 60000);
-}
-
-async function checkVIP() {
-  const vip = await contract.methods.isVIP().call({ from: account });
-  document.getElementById("vipStatus").innerText = vip ? "✅ شما VIP هستید" : "🔒 شما VIP نیستید";
-  document.getElementById("auctionSection").style.display = vip ? "block" : "none";
-  if (vip) {
-    loadParticipants(1);
-    loadParticipants(2);
-  }
-}
-
-async function buyVIP() {
-  try {
-    await contract.methods.buyVIP().send({ from: account, value: web3.utils.toWei("0.001", "ether") });
-    alert("VIP فعال شد!");
-    checkVIP();
-  } catch (e) { alert("❌ خطا در خرید VIP"); }
-}
-
-async function bidAuction(id, inputId) {
-  const val = document.getElementById(inputId).value;
-  if (!val || parseFloat(val) <= 0) return alert("مقدار نامعتبر");
-  try {
-    await contract.methods.bidAuction(id).send({ from: account, value: web3.utils.toWei(val, "ether") });
-    alert("✅ شرکت در مزایده با موفقیت");
-    loadParticipants(id);
-  } catch (e) { alert("❌ خطا در مزایده"); }
-}
-
-async function loadParticipants(id) {
-  const [addrs, amnts] = await contract.methods.getAuctionList(id).call();
-  const list = document.getElementById(id === 1 ? "list30" : "list60");
-  list.innerHTML = "";
-  for (let i = 0; i < addrs.length; i++) {
-    const bnb = web3.utils.fromWei(amnts[i], "ether");
-    list.innerHTML += `<li>${addrs[i]} ➤ ${bnb} BNB</li>`;
-  }
-}
-
-async function checkAdmin() {
-  if (account.toLowerCase() === ownerAddress.toLowerCase()) {
-    document.getElementById("adminSection").style.display = "block";
-  }
-}
-
-async function loadRewards() {
-  const r30 = await contract.methods.reward30().call();
-  const r60 = await contract.methods.reward60().call();
-  document.getElementById("reward30").innerText = r30;
-  document.getElementById("reward60").innerText = r60;
-  document.getElementById("setReward30").value = r30;
-  document.getElementById("setReward60").value = r60;
-}
-
-async function updateRewards() {
-  const r30 = document.getElementById("setReward30").value;
-  const r60 = document.getElementById("setReward60").value;
-  try {
-    await contract.methods.setRewards(r30, r60).send({ from: account });
-    alert("✅ بروزرسانی موفق");
-    loadRewards();
-  } catch (e) {
-    alert("❌ خطا در بروزرسانی");
-  }
-}
-
-function updateTimers() {
-  const now = new Date();
-  const end30 = new Date("2025-08-30");
-  const end60 = new Date("2025-09-30");
-  document.getElementById("time30").innerText = diffText(end30 - now);
-  document.getElementById("time60").innerText = diffText(end60 - now);
-}
-
-function diffText(ms) {
-  if (ms < 0) return "پایان یافته";
-  const d = Math.floor(ms / (1000 * 60 * 60 * 24));
-  const h = Math.floor((ms / (1000 * 60 * 60)) % 24);
-  return `${d} روز و ${h} ساعت`;
-}
-</script>
+  <script src="auction.js"></script>
 </body>
 </html>
