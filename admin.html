@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>مدیریت مزایده</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
+  <style>
+    body { font-family: sans-serif; background: #f0f0f0; padding: 20px; }
+    .panel { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+    label { display: block; margin: 10px 0 5px; }
+    input[type=number], input[type=text] { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
+    button { margin-top: 15px; padding: 10px 20px; border: none; background: #0088ff; color: white; border-radius: 8px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <div class="panel">
+    <h2>🛠️ پنل مدیریت مزایده</h2>
+
+    <p>آدرس کیف پول شما: <span id="adminAddress">❌</span></p>
+
+    <label>مقدار جایزه مزایده 30 روزه (توکن):</label>
+    <input type="number" id="reward30Input" />
+
+    <label>مقدار جایزه مزایده 60 روزه (توکن):</label>
+    <input type="number" id="reward60Input" />
+
+    <label>حداکثر مبلغ شروع پیشنهاد (BNB):</label>
+    <input type="number" id="maxBidInput" />
+
+    <button onclick="updateConfig()">💾 ذخیره تنظیمات</button>
+
+    <hr>
+
+    <button onclick="resetAuctions()">🔁 ریست کامل مزایده‌ها</button>
+    <p id="status"></p>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
