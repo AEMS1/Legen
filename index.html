@@ -2,180 +2,167 @@
 <html lang="fa">
 <head>
   <meta charset="UTF-8">
-  <title>بخش مزایده VIP</title>
+  <title>مدیریت مزایده</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
-    body { font-family: sans-serif; background: #111; color: #eee; text-align: center; padding: 20px; }
-    button { padding: 10px 20px; font-size: 16px; margin: 10px; }
-    .hidden { display: none; }
-    #auctionArea { margin-top: 30px; }
-    table { width: 100%; max-width: 500px; margin: 10px auto; border-collapse: collapse; }
-    th, td { border: 1px solid #444; padding: 8px; }
+    body { font-family: sans-serif; direction: rtl; background: #f3f3f3; padding: 20px; }
+    .box { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+    .admin-only { border: 2px dashed red; margin-top: 20px; padding: 15px; }
+    button { padding: 8px 15px; margin-top: 10px; }
+    input { padding: 5px; margin: 5px 0; width: 100%; }
   </style>
 </head>
 <body>
-  <h1>🎯 بخش مزایده VIP</h1>
-  <p id="wallet"></p>
-  <button onclick="connect()">اتصال کیف پول</button>
-  <div id="vipArea" class="hidden">
-    <p>برای دسترسی به مزایده باید VIP باشید.</p>
-    <button onclick="buyVIP()">خرید VIP (حدود 1 دلار)</button>
+  <h2>🎯 مدیریت مزایده پیشرفته</h2>
+  <button onclick="connectWallet()">اتصال کیف پول 🔌</button>
+  <p id="wallet">کیف پول: متصل نیست</p>
+
+  <div class="box">
+    <p id="vipStatus">🔒 وضعیت VIP شما: بررسی نشده</p>
+    <button onclick="buyVIP()">خرید VIP (1 دلار BNB)</button>
   </div>
-  <div id="auctionArea" class="hidden">
-    <h2>✅ شما VIP هستید</h2>
+
+  <div class="box" id="auctionSection" style="display:none;">
+    <h3>🔥 مزایده‌ها</h3>
 
     <div>
-      <h3>مزایده 30 روزه 🎁</h3>
-      <p>جایزه: 10000 توکن</p>
-      <input id="bid30" type="number" placeholder="مقدار BNB">
-      <button onclick="placeBid30()">شرکت در مزایده 30 روزه</button>
-      <div>
-        <h4>لیست شرکت‌کننده‌ها</h4>
-        <div id="list30"></div>
-      </div>
+      <h4>مزایده 30 روزه</h4>
+      <p>🎁 جایزه: <span id="reward30">---</span> توکن</p>
+      <p>⏳ زمان باقی‌مانده: <span id="time30">--</span></p>
+      <input type="number" id="bidAmount30" placeholder="مقدار BNB">
+      <button onclick="bidAuction(1, 'bidAmount30')">شرکت در مزایده</button>
+      <ul id="list30"></ul>
     </div>
 
-    <hr>
-
-    <div>
-      <h3>مزایده 60 روزه 🎁</h3>
-      <p>جایزه: 30000 توکن</p>
-      <input id="bid60" type="number" placeholder="مقدار BNB">
-      <button onclick="placeBid60()">شرکت در مزایده 60 روزه</button>
-      <div>
-        <h4>لیست شرکت‌کننده‌ها</h4>
-        <div id="list60"></div>
-      </div>
+    <div style="margin-top:20px">
+      <h4>مزایده 60 روزه</h4>
+      <p>🎁 جایزه: <span id="reward60">---</span> توکن</p>
+      <p>⏳ زمان باقی‌مانده: <span id="time60">--</span></p>
+      <input type="number" id="bidAmount60" placeholder="مقدار BNB">
+      <button onclick="bidAuction(2, 'bidAmount60')">شرکت در مزایده</button>
+      <ul id="list60"></ul>
     </div>
   </div>
 
-  <script>
-    let web3, contract;
-    const contractAddress = "0x81811cf143ee0db0f31508640b5ab164efbc353a";
-    const abi = [
-  {
-    "inputs": [],
-    "name": "buyVIP",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint8", "name": "auctionId", "type": "uint8" }
-    ],
-    "name": "joinAuction",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "user", "type": "address" }],
-    "name": "isVIP",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getVIPExpireTime",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint8", "name": "auctionId", "type": "uint8" }],
-    "name": "getAuctionData",
-    "outputs": [
-      { "internalType": "uint256", "name": "endTime", "type": "uint256" },
-      { "internalType": "uint256", "name": "rewardAmount", "type": "uint256" },
-      { "internalType": "address[]", "name": "users", "type": "address[]" },
-      { "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint8", "name": "auctionId", "type": "uint8" },
-      { "internalType": "uint256", "name": "reward", "type": "uint256" }
-    ],
-    "name": "setAuctionReward",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "_vipPrice", "type": "uint256" }],
-    "name": "setVIPPrice",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint8", "name": "auctionId", "type": "uint8" }],
-    "name": "resetAuction",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+  <div class="admin-only" id="adminSection" style="display:none">
+    <h3>🔧 تنظیمات مدیر</h3>
+    <p>تغییر جایزه‌ها</p>
+    <label>جایزه 30 روزه:</label>
+    <input id="setReward30" type="number">
+    <label>جایزه 60 روزه:</label>
+    <input id="setReward60" type="number">
+    <button onclick="updateRewards()">بروزرسانی جوایز</button>
+  </div>
+
+<script>
+const contractAddress = "0x81811cf143ee0db0f31508640b5ab164efbc353a";
+const ownerAddress = "0xec54951C7d4619256Ea01C811fFdFa01A9925683"; // تغییر بده در صورت نیاز
+let account, web3, contract;
+
+const abi = [
+  { "inputs":[],"name":"buyVIP","outputs":[],"stateMutability":"payable","type":"function" },
+  { "inputs":[{"internalType":"uint8","name":"typeId","type":"uint8"}],"name":"bidAuction","outputs":[],"stateMutability":"payable","type":"function" },
+  { "inputs":[],"name":"isVIP","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function" },
+  { "inputs":[{"internalType":"uint8","name":"typeId","type":"uint8"}],"name":"getAuctionList","outputs":[{"internalType":"address[]","name":"addrs","type":"address[]"},{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"view","type":"function" },
+  { "inputs":[],"name":"reward30","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function" },
+  { "inputs":[],"name":"reward60","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function" },
+  { "inputs":[{"internalType":"uint256","name":"r30","type":"uint256"},{"internalType":"uint256","name":"r60","type":"uint256"}],"name":"setRewards","outputs":[],"stateMutability":"nonpayable","type":"function" }
+];
+
+async function connectWallet() {
+  if (!window.ethereum) return alert("Metamask نصب نیست");
+  web3 = new Web3(window.ethereum);
+  await window.ethereum.request({ method: 'eth_requestAccounts' });
+  const accounts = await web3.eth.getAccounts();
+  account = accounts[0];
+  contract = new web3.eth.Contract(abi, contractAddress);
+  document.getElementById("wallet").innerText = "کیف پول: " + account;
+  checkVIP();
+  checkAdmin();
+  loadRewards();
+  updateTimers();
+  setInterval(updateTimers, 60000);
+}
+
+async function checkVIP() {
+  const vip = await contract.methods.isVIP().call({ from: account });
+  document.getElementById("vipStatus").innerText = vip ? "✅ شما VIP هستید" : "🔒 شما VIP نیستید";
+  document.getElementById("auctionSection").style.display = vip ? "block" : "none";
+  if (vip) {
+    loadParticipants(1);
+    loadParticipants(2);
   }
-]; // اینجا ABI قرارداد را قرار بده
+}
 
-    async function connect() {
-      if (window.ethereum) {
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        web3 = new Web3(window.ethereum);
-        const accounts = await web3.eth.getAccounts();
-        contract = new web3.eth.Contract(abi, contractAddress);
-        document.getElementById("wallet").innerText = `کیف پول: ${accounts[0]}`;
-        checkVIP();
-      } else {
-        alert("لطفاً MetaMask نصب کنید.");
-      }
-    }
+async function buyVIP() {
+  try {
+    await contract.methods.buyVIP().send({ from: account, value: web3.utils.toWei("0.001", "ether") });
+    alert("VIP فعال شد!");
+    checkVIP();
+  } catch (e) { alert("❌ خطا در خرید VIP"); }
+}
 
-    async function checkVIP() {
-      const user = (await web3.eth.getAccounts())[0];
-      const exp = await contract.methods.vipExpiry(user).call();
-      const now = Math.floor(Date.now() / 1000);
-      if (exp > now) {
-        document.getElementById("vipArea").classList.add("hidden");
-        document.getElementById("auctionArea").classList.remove("hidden");
-        loadBids();
-      } else {
-        document.getElementById("vipArea").classList.remove("hidden");
-      }
-    }
+async function bidAuction(id, inputId) {
+  const val = document.getElementById(inputId).value;
+  if (!val || parseFloat(val) <= 0) return alert("مقدار نامعتبر");
+  try {
+    await contract.methods.bidAuction(id).send({ from: account, value: web3.utils.toWei(val, "ether") });
+    alert("✅ شرکت در مزایده با موفقیت");
+    loadParticipants(id);
+  } catch (e) { alert("❌ خطا در مزایده"); }
+}
 
-    async function buyVIP() {
-      const user = (await web3.eth.getAccounts())[0];
-      const price = await contract.methods.vipPrice().call();
-      await contract.methods.buyVIP().send({ from: user, value: price });
-      alert("خرید VIP موفق بود!");
-      checkVIP();
-    }
+async function loadParticipants(id) {
+  const [addrs, amnts] = await contract.methods.getAuctionList(id).call();
+  const list = document.getElementById(id === 1 ? "list30" : "list60");
+  list.innerHTML = "";
+  for (let i = 0; i < addrs.length; i++) {
+    const bnb = web3.utils.fromWei(amnts[i], "ether");
+    list.innerHTML += `<li>${addrs[i]} ➤ ${bnb} BNB</li>`;
+  }
+}
 
-    async function placeBid30() {
-      const user = (await web3.eth.getAccounts())[0];
-      const val = web3.utils.toWei(document.getElementById("bid30").value, "ether");
-      await contract.methods.placeBid30().send({ from: user, value: val });
-      loadBids();
-    }
+async function checkAdmin() {
+  if (account.toLowerCase() === ownerAddress.toLowerCase()) {
+    document.getElementById("adminSection").style.display = "block";
+  }
+}
 
-    async function placeBid60() {
-      const user = (await web3.eth.getAccounts())[0];
-      const val = web3.utils.toWei(document.getElementById("bid60").value, "ether");
-      await contract.methods.placeBid60().send({ from: user, value: val });
-      loadBids();
-    }
+async function loadRewards() {
+  const r30 = await contract.methods.reward30().call();
+  const r60 = await contract.methods.reward60().call();
+  document.getElementById("reward30").innerText = r30;
+  document.getElementById("reward60").innerText = r60;
+  document.getElementById("setReward30").value = r30;
+  document.getElementById("setReward60").value = r60;
+}
 
-    async function loadBids() {
-      const bids30 = await contract.methods.getBids30().call();
-      const bids60 = await contract.methods.getBids60().call();
+async function updateRewards() {
+  const r30 = document.getElementById("setReward30").value;
+  const r60 = document.getElementById("setReward60").value;
+  try {
+    await contract.methods.setRewards(r30, r60).send({ from: account });
+    alert("✅ بروزرسانی موفق");
+    loadRewards();
+  } catch (e) {
+    alert("❌ خطا در بروزرسانی");
+  }
+}
 
-      document.getElementById("list30").innerHTML = bids30.map(b => `${b.bidder} ➤ ${web3.utils.fromWei(b.amount)} BNB`).join("<br>");
-      document.getElementById("list60").innerHTML = bids60.map(b => `${b.bidder} ➤ ${web3.utils.fromWei(b.amount)} BNB`).join("<br>");
-    }
-  </script>
+function updateTimers() {
+  const now = new Date();
+  const end30 = new Date("2025-08-30");
+  const end60 = new Date("2025-09-30");
+  document.getElementById("time30").innerText = diffText(end30 - now);
+  document.getElementById("time60").innerText = diffText(end60 - now);
+}
+
+function diffText(ms) {
+  if (ms < 0) return "پایان یافته";
+  const d = Math.floor(ms / (1000 * 60 * 60 * 24));
+  const h = Math.floor((ms / (1000 * 60 * 60)) % 24);
+  return `${d} روز و ${h} ساعت`;
+}
+</script>
 </body>
 </html>
