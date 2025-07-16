@@ -1,62 +1,39 @@
+<!-- 📄 auction.html -->
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>صفحه مزایده</title>
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
-  <style>
-    body { font-family: sans-serif; background: #f7f7f7; padding: 20px; }
-    .vip-box, .auction-box { background: white; padding: 20px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    button { padding: 10px 20px; border: none; background: #0088ff; color: white; border-radius: 8px; cursor: pointer; }
-    button:disabled { background: #aaa; }
-    .participant { margin: 5px 0; }
-    .reward-box { margin-top: 10px; background: #e6f7ff; padding: 10px; border-radius: 8px; }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VIP Auction</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="vipAbi.js"></script>
+  <script src="auction.js" defer></script>
 </head>
 <body>
+  <h1>🎯 VIP Auction Panel</h1>
 
-  <h1>🎯 ورود به مزایده</h1>
-
-  <!-- دکمه اتصال کیف پول -->
   <button onclick="connectWallet()">اتصال کیف پول</button>
-  <p>آدرس: <span id="walletAddress">❌</span></p>
+  <div id="wallet"></div>
 
-  <!-- باکس خرید VIP -->
-  <div class="vip-box" id="vipBox">
-    <h3>برای ورود به مزایده باید VIP بخرید (1 دلار)</h3>
-    <button onclick="buyVIP()">پرداخت و فعال‌سازی VIP</button>
-    <p id="vipStatus">وضعیت VIP: ❌</p>
+  <hr>
+  <h3>🔒 خرید VIP (1 دلار BNB):</h3>
+  <button onclick="buyVIP()">خرید VIP</button>
+  <div id="vipStatus"></div>
+
+  <hr>
+  <div id="auctionPanel" style="display:none;">
+    <h3>🕐 مزایده 30 روزه (جایزه: <span id="reward30">-</span>)</h3>
+    <input id="bid30" type="number" placeholder="مقدار BNB پیشنهاد">
+    <button onclick="placeBid(30)">شرکت در مزایده 30 روزه</button>
+    <div id="bids30"></div>
+
+    <h3>🕑 مزایده 60 روزه (جایزه: <span id="reward60">-</span>)</h3>
+    <input id="bid60" type="number" placeholder="مقدار BNB پیشنهاد">
+    <button onclick="placeBid(60)">شرکت در مزایده 60 روزه</button>
+    <div id="bids60"></div>
+
+    <h3>🏆 برندگان:</h3>
+    <div id="winners"></div>
   </div>
-
-  <!-- پنل مزایده -->
-  <div class="auction-box" id="auctionPanel" style="display:none;">
-    <h2>🪙 لیست مزایده‌ها</h2>
-
-    <!-- مزایده 30 روزه -->
-    <div id="auction30">
-      <h3>🎁 مزایده 30 روزه</h3>
-      <p>جایزه: <span id="reward30">10,000 LGD</span></p>
-      <input type="number" id="amount30" placeholder="مقدار پیشنهادی (BNB)" />
-      <button onclick="enterAuction(30)">شرکت در مزایده</button>
-      <div id="list30"></div>
-    </div>
-
-    <hr />
-
-    <!-- مزایده 60 روزه -->
-    <div id="auction60">
-      <h3>🎁 مزایده 60 روزه</h3>
-      <p>جایزه: <span id="reward60">30,000 LGD</span></p>
-      <input type="number" id="amount60" placeholder="مقدار پیشنهادی (BNB)" />
-      <button onclick="enterAuction(60)">شرکت در مزایده</button>
-      <div id="list60"></div>
-    </div>
-
-    <hr />
-    <!-- دکمه مدیریت (فقط برای مالک) -->
-    <button onclick="resetAuctions()">🔁 ریست مزایده‌ها</button>
-  </div>
-
-  <script src="auction.js"></script>
 </body>
 </html>
