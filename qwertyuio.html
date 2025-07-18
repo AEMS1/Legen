@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Discussion Panel</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="loginSection">
+    <h2>Choose Your Username</h2>
+    <input type="text" id="usernameInput" placeholder="Enter a unique username" />
+    <button onclick="setUsername()">Save</button>
+  </div>
+
+  <div id="discussionPanel" style="display:none;">
+    <h2>Welcome, <span id="currentUsername"></span></h2>
+
+    <div>
+      <textarea id="postText" placeholder="Share your thoughts..."></textarea>
+      <input type="file" id="postImage" accept="image/*" />
+      <button onclick="submitPost()">Post</button>
+    </div>
+
+    <div id="postContainer"></div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
