@@ -1,29 +1,135 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa">
 <head>
-  <meta charset="UTF-8" />
-  <title>Discussion Panel</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>🎥 Watch & Earn</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f3f3f3;
+      padding: 20px;
+      direction: rtl;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    .video-block {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .video-block a {
+      display: block;
+      margin-bottom: 10px;
+      color: #007bff;
+      text-decoration: none;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:disabled {
+      background-color: #aaa;
+    }
+    .msg {
+      margin-top: 8px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <div id="loginSection">
-    <h2>Choose Your Username</h2>
-    <input type="text" id="usernameInput" placeholder="Enter a unique username" />
-    <button onclick="setUsername()">Save</button>
-  </div>
 
-  <div id="discussionPanel" style="display:none;">
-    <h2>Welcome, <span id="currentUsername"></span></h2>
+<h2>🎥 ویدیو ببین، جایزه بگیر</h2>
+<div id="videoContainer"></div>
 
-    <div>
-      <textarea id="postText" placeholder="Share your thoughts..."></textarea>
-      <input type="file" id="postImage" accept="image/*" />
-      <button onclick="submitPost()">Post</button>
-    </div>
+<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+<script>
+  // ✅ فقط خودت اینجا ویدیوها و جواب‌ها رو وارد کن
+  const videoQuestions = [
+    { id: 1, url: "https://www.youtube.com/watch?v=abc123", answer: "legend" },
+    { id: 2, url: "https://www.youtube.com/watch?v=def456", answer: "crypto" }
+  ];
 
-    <div id="postContainer"></div>
-  </div>
+  const userAnswers = JSON.parse(localStorage.getItem("userAnswers") || "{}");
+  const container = document.getElementById("videoContainer");
 
-  <script src="main.js"></script>
+  videoQuestions.forEach(video => {
+    const isAnswered = userAnswers[video.id];
+    container.innerHTML += `
+      <div class="video-block" id="block-${video.id}">
+        <a href="${video.url}" target="_blank">🎬 دیدن ویدیو ${video.id}</a>
+        <input type="text" id="input-${video.id}" placeholder="کلمه‌ای که دیدی رو بنویس" ${isAnswered ? "disabled" : ""}>
+        <button onclick="submitAnswer(${video.id})" ${isAnswered ? "disabled" : ""}>ارسال پاسخ</button>
+        <div class="msg" id="msg-${video.id}">${isAnswered ? "قبلاً پاسخ دادی." : ""}</div>
+      </div>
+    `;
+  });
+
+  const tokenAddress = "0xYourTokenAddress";  // آدرس توکنت
+  const rewardAmount = "35000000000000000";   // معادل 0.035 توکن (با 18 رقم اعشار)
+
+  const tokenABI = [
+    {
+      "constant": false,
+      "inputs": [
+        { "name": "_to", "type": "address" },
+        { "name": "_value", "type": "uint256" }
+      ],
+      "name": "transfer",
+      "outputs": [{ "name": "", "type": "bool" }],
+      "type": "function"
+    }
+  ];
+
+  async function submitAnswer(id) {
+    const input = document.getElementById(`input-${id}`);
+    const msg = document.getElementById(`msg-${id}`);
+    const userInput = input.value.trim().toLowerCase();
+    const correctAnswer = videoQuestions.find(v => v.id === id).answer.toLowerCase();
+
+    if (!userInput) return alert("لطفاً پاسخ را وارد کن");
+
+    if (userInput === correctAnswer) {
+      if (typeof window.ethereum === "undefined") return alert("کیف پول متامسک نصب نیست");
+
+      try {
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        const user = accounts[0];
+        const web3 = new Web3(window.ethereum);
+        const tokenContract = new web3.eth.Contract(tokenABI, tokenAddress);
+
+        await tokenContract.methods.transfer(user, rewardAmount).send({ from: user });
+
+        msg.innerText = "✅ پاسخ صحیح بود! توکن برات فرستاده شد.";
+        input.disabled = true;
+        input.nextElementSibling.disabled = true;
+
+        userAnswers[id] = true;
+        localStorage.setItem("userAnswers", JSON.stringify(userAnswers));
+
+      } catch (err) {
+        console.error(err);
+        msg.innerText = "❌ مشکلی در ارسال پاداش پیش آمد.";
+      }
+    } else {
+      msg.innerText = "❌ پاسخ اشتباه است!";
+    }
+  }
+</script>
+
 </body>
 </html>
