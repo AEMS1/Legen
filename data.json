@@ -1,0 +1,12 @@
+[
+  {
+    "id": "vid1",
+    "title": "legend",
+    "youtube": "https://www.youtube.com/watch?v=abc123"
+  },
+  {
+    "id": "vid2",
+    "title": "یادگیری سریع دیفای",
+    "youtube": "https://www.youtube.com/watch?v=xyz456"
+  }
+]
