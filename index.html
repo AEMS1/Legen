@@ -2,19 +2,104 @@
 <html lang="fa">
 <head>
   <meta charset="UTF-8">
-  <title>پاسخ به ویدیوها - Legend Quiz</title>
+  <title>پنل مدیریت آزمون‌ها</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body { font-family: sans-serif; max-width: 500px; margin: auto; padding: 20px; direction: rtl; }
+    input, button { width: 100%; padding: 10px; margin-top: 10px; font-size: 16px; }
+    #status { margin-top: 20px; color: green; }
+    #error { color: red; margin-top: 10px; }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🎥 پاسخ به سوالات ویدیویی</h1>
-    <p id="walletAddress">کیف پول: <button onclick="connectWallet()">اتصال</button></p>
-    <div id="quizContainer"></div>
+  <h2>🎬 مدیریت ویدیو و پاسخ‌ها</h2>
+
+  <button onclick="connectWallet()">اتصال کیف پول</button>
+  <p>کیف پول متصل: <span id="walletAddress">-</span></p>
+
+  <div id="adminForm" style="display:none;">
+    <input type="text" id="videoId" placeholder="شناسه ویدیو (مثلاً: vid1)">
+    <input type="text" id="answer" placeholder="پاسخ صحیح (مثلاً: legend)">
+    <button onclick="addQuiz()">📥 ثبت آزمون</button>
   </div>
 
+  <div id="status"></div>
+  <div id="error"></div>
+
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-  <script src="quizABI.js"></script>
-  <script src="main.js"></script>
+  <script>
+    const contractAddress = "0xa3ea1b32784e702797915d836a063a4836378e5c";
+    const contractABI = [
+      {
+        "inputs": [
+          { "internalType": "string", "name": "_videoId", "type": "string" },
+          { "internalType": "string", "name": "_answer", "type": "string" }
+        ],
+        "name": "addQuiz",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ];
+
+    let web3;
+    let contract;
+    let userAddress;
+
+    async function connectWallet() {
+      if (window.ethereum) {
+        try {
+          await window.ethereum.request({ method: "eth_requestAccounts" });
+          web3 = new Web3(window.ethereum);
+          const accounts = await web3.eth.getAccounts();
+          userAddress = accounts[0];
+          document.getElementById("walletAddress").textContent = userAddress;
+
+          contract = new web3.eth.Contract(contractABI, contractAddress);
+
+          const owner = await contract.methods.owner().call();
+          if (owner.toLowerCase() === userAddress.toLowerCase()) {
+            document.getElementById("adminForm").style.display = "block";
+          } else {
+            document.getElementById("error").textContent = "❌ فقط مالک قرارداد می‌تواند آزمون اضافه کند.";
+          }
+
+        } catch (error) {
+          console.error(error);
+        }
+      } else {
+        alert("لطفاً متامسک را نصب کنید.");
+      }
+    }
+
+    async function addQuiz() {
+      const videoId = document.getElementById("videoId").value.trim();
+      const answer = document.getElementById("answer").value.trim();
+
+      if (!videoId || !answer) {
+        document.getElementById("error").textContent = "⚠ لطفاً هر دو فیلد را پر کنید.";
+        return;
+      }
+
+      try {
+        document.getElementById("status").textContent = "⏳ در حال ثبت...";
+        document.getElementById("error").textContent = "";
+
+        await contract.methods.addQuiz(videoId, answer).send({ from: userAddress });
+
+        document.getElementById("status").textContent = "✅ ثبت با موفقیت انجام شد.";
+      } catch (err) {
+        console.error(err);
+        document.getElementById("error").textContent = "❌ خطا در ثبت آزمون.";
+      }
+    }
+  </script>
 </body>
 </html>
