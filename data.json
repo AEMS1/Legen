@@ -3,7 +3,6 @@
     "id": "vid1",
     "title": "legend",
     "youtube": "https://www.youtube.com/watch?v=abc123"
-    correctAnswer: "legend"
   },
   {
     "id": "vid2",
