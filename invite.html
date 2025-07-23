@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <title>دعوت دوستان - Legend Swap</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h2>دعوت از دوستان 🎁</h2>
+  <p>کیف پول: <span id="wallet">--</span></p>
+  <button onclick="connectWallet()">اتصال کیف پول 🔌</button>
+  <br><br>
+
+  <button onclick="copyReferral()">📋 کپی لینک دعوت</button>
+  <br><br>
+
+  <button onclick="sendBNB()">✅ تایید و دریافت پاداش</button>
+
+  <p id="status"></p>
+
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="invite.js"></script>
+</body>
+</html>
