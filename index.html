@@ -1,89 +1,92 @@
 <!-- main.html (فقط بخش پنل 3) -->
+<head>
+<link rel="stylesheet" href="style.css">
+</head>
 <div id="panel3" class="airdrop-panel">
-  <h2>ایردراپ‌ها</h2>
-  <div id="airdropList" class="airdrop-list"></div>
-</div>
-
-<!-- style.css (بخش مربوط به پنل ایردراپ) -->
-<style>
-  .airdrop-panel {
-    padding: 20px;
-    direction: rtl;
-  }
-  .airdrop-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-  }
-  .airdrop-card {
-    border: 1px solid #ccc;
-    border-radius: 12px;
-    padding: 16px;
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    transition: 0.3s;
-  }
-  .airdrop-card:hover {
-    transform: translateY(-4px);
-  }
-  .airdrop-card img {
-    width: 100%;
-    max-height: 150px;
-    object-fit: contain;
-    margin-bottom: 12px;
-  }
-  .airdrop-card h3 {
-    font-size: 18px;
-    margin-bottom: 8px;
-  }
-  .airdrop-card p {
-    font-size: 14px;
-    color: #333;
-    margin-bottom: 12px;
-  }
-  .airdrop-card a {
-    display: inline-block;
-    padding: 8px 12px;
-    background-color: #4CAF50;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-size: 14px;
-  }
-</style>
-
-<!-- main.js (اضافه به آخر فایل) -->
-<script>
-  const airdrops = [
-    {
-      title: "TokenX Airdrop",
-      image: "images/tokenx.png",
-      description: "100 توکن رایگان TokenX دریافت کنید با ثبت‌نام!",
-      link: "https://tokenx.io/airdrop"
-    },
-    {
-      title: "LegendCoin Giveaway",
-      image: "images/legend.png",
-      description: "50 توکن LGD رایگان فقط با ثبت ایمیل.",
-      link: "https://legendcoin.org/join"
+    <h2>ایردراپ‌ها</h2>
+    <div id="airdropList" class="airdrop-list"></div>
+  </div>
+  
+  <!-- style.css (بخش مربوط به پنل ایردراپ) -->
+  <style>
+    .airdrop-panel {
+      padding: 20px;
+      direction: rtl;
     }
-  ];
-
-  function renderAirdrops() {
-    const list = document.getElementById("airdropList");
-    list.innerHTML = "";
-    airdrops.forEach(drop => {
-      const card = document.createElement("div");
-      card.className = "airdrop-card";
-      card.innerHTML = `
-        <img src="${drop.image}" alt="${drop.title}" />
-        <h3>${drop.title}</h3>
-        <p>${drop.description}</p>
-        <a href="${drop.link}" target="_blank">شرکت در ایردراپ</a>
-      `;
-      list.appendChild(card);
-    });
-  }
-
-  renderAirdrops();
-</script>
+    .airdrop-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .airdrop-card {
+      border: 1px solid #ffffff00;
+      border-radius: 12px;
+      padding: 16px;
+      background-color: #ffffff00;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0);
+      transition: 0.3s;
+    }
+    .airdrop-card:hover {
+      transform: translateY(-4px);
+    }
+    .airdrop-card img {
+      width: 100%;
+      max-height: 150px;
+      object-fit: contain;
+      margin-bottom: 12px;
+    }
+    .airdrop-card h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    .airdrop-card p {
+      font-size: 14px;
+      color: #33333300;
+      margin-bottom: 12px;
+    }
+    .airdrop-card a {
+      display: inline-block;
+      padding: 8px 12px;
+      background-color: #007a9900;
+      color: rgba(255, 255, 255, 0);
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+  </style>
+  
+  <!-- main.js (اضافه به آخر فایل) -->
+  <script>
+    const airdrops = [
+      {
+        title: "TokenX Airdrop",
+        image: "images/tokenx.png",
+        description: "100 توکن رایگان TokenX دریافت کنید با ثبت‌نام!",
+        link: "https://tokenx.io/airdrop"
+      },
+      {
+        title: "LegendCoin Giveaway",
+        image: "images/legend.png",
+        description: "50 توکن LGD رایگان فقط با ثبت ایمیل.",
+        link: "https://legendcoin.org/join"
+      }
+    ];
+  
+    function renderAirdrops() {
+      const list = document.getElementById("airdropList");
+      list.innerHTML = "";
+      airdrops.forEach(drop => {
+        const card = document.createElement("div");
+        card.className = "airdrop-card";
+        card.innerHTML = `
+          <img src="${drop.image}" alt="${drop.title}" />
+          <h3>${drop.title}</h3>
+          <p>${drop.description}</p>
+          <a href="${drop.link}" target="_blank">شرکت در ایردراپ</a>
+        `;
+        list.appendChild(card);
+      });
+    }
+  
+    renderAirdrops();
+  </script>
