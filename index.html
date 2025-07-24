@@ -8,6 +8,7 @@
   <div id="airdropList" class="airdrop-list"></div>
 </div>
 
+<!-- Style (you can move this to style.css if needed) -->
 <style>
   .airdrop-panel {
     padding: 20px;
@@ -16,7 +17,7 @@
 
   .airdrop-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* ثابت: 3 ستون */
+    grid-template-columns: repeat(3, 1fr); /* Exactly 3 per row */
     gap: 20px;
   }
 
@@ -62,7 +63,6 @@
     font-size: 14px;
   }
 
-  /* ریسپانسیو برای موبایل */
   @media (max-width: 992px) {
     .airdrop-list {
       grid-template-columns: repeat(2, 1fr);
@@ -76,6 +76,7 @@
   }
 </style>
 
+<!-- Script to render the airdrops -->
 <script>
   const airdrops = [
     {
@@ -114,18 +115,20 @@
       description: "Participate and win up to 500 GLX tokens!",
       link: "https://galaxyairdrop.com"
     }
-    {
-      title: "Galaxy Rewards",
-      image: "images/galaxy.png",
-      description: "Participate and win up to 500 GLX tokens!",
-      link: "https://galaxyairdrop.com"
-    }
-    {
-      title: "Galaxy Rewards",
-      image: "images/galaxy.png",
-      description: "Participate and win up to 500 GLX tokens!",
-      link: "https://galaxyairdrop.com"
-    }
+    <div class="airdrop-card">
+     <img src="https://example.com/images/airdrop1.png" alt="Airdrop 1">
+     <h3>AI Token Airdrop</h3>
+     <p>دریافت رایگان 100 توکن AI با ثبت‌نام ساده و عضویت در دیسکورد!</p>
+     <a href="https://airdrop.ai/register" target="_blank" class="btn">مشاهده ایردراپ</a>
+    </div>
+
+    <div class="airdrop-card">
+     <img src="https://example.com/images/airdrop2.png" alt="Airdrop 2">
+     <h3>MetaVerse X Airdrop</h3>
+     <p>با دعوت 5 دوست، 200 متا توکن دریافت کن. سریع ثبت‌نام کن!</p>
+     <a href="https://metax.io/airdrop" target="_blank" class="btn">مشاهده ایردراپ</a>
+   </div>
+
   ];
 
   function renderAirdrops() {
