@@ -63,37 +63,44 @@
   }
 </style>
 
+<!-- main.js (added to the end of file or inline) -->
 <script>
-      const airdrops = [
-        {
-          title: "TokenX Airdrop",
-          image: "images/tokenx.png",
-          description: "100 توکن رایگان TokenX دریافت کنید با ثبت‌نام!",
-          link: "https://tokenx.io/airdrop"
-        },
-        {
-          title: "LegendCoin Giveaway",
-          image: "images/legend.png",
-          description: "50 توکن LGD رایگان فقط با ثبت ایمیل.",
-          link: "https://legendcoin.org/join"
-        }
-      ];
-    
-      function renderAirdrops() {
-        const list = document.getElementById("airdropList");
-        list.innerHTML = "";
-        airdrops.forEach(drop => {
-          const card = document.createElement("div");
-          card.className = "airdrop-card";
-          card.innerHTML = `
-            <img src="${drop.image}" alt="${drop.title}" />
-            <h3>${drop.title}</h3>
-            <p>${drop.description}</p>
-            <a href="${drop.link}" target="_blank">شرکت در ایردراپ</a>
-          `;
-          list.appendChild(card);
-        });
-      }
-    
-      renderAirdrops();
-    </script>
+  const airdrops = [
+    {
+      title: "TokenX Airdrop",
+      image: "images/tokenx.png",
+      description: "Claim 100 free TokenX by signing up!",
+      link: "https://tokenx.io/airdrop"
+    },
+     {
+      title: "TokenX Airdrop",
+      image: "images/tokenx.png",
+      description: "Claim 100 free TokenX by signing up!",
+      link: "https://tokenx.io/airdrop"
+    },
+    {
+      title: "LegendCoin Giveaway",
+      image: "images/legend.png",
+      description: "Get 50 free LGD tokens just by registering your email.",
+      link: "https://legendcoin.org/join"
+    }
+  ];
+
+  function renderAirdrops() {
+    const list = document.getElementById("airdropList");
+    list.innerHTML = "";
+    airdrops.forEach(drop => {
+      const card = document.createElement("div");
+      card.className = "airdrop-card";
+      card.innerHTML = `
+        <img src="${drop.image}" alt="${drop.title}" />
+        <h3>${drop.title}</h3>
+        <p>${drop.description}</p>
+        <a href="${drop.link}" target="_blank">Join Airdrop</a>
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  renderAirdrops();
+</script>
