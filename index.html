@@ -1,5 +1,6 @@
 <head>
   <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <div id="panel3" class="airdrop-panel">
@@ -7,7 +8,6 @@
   <div id="airdropList" class="airdrop-list"></div>
 </div>
 
-<!-- style.css (Airdrop section style) -->
 <style>
   .airdrop-panel {
     padding: 20px;
@@ -16,16 +16,16 @@
 
   .airdrop-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr); /* ثابت: 3 ستون */
     gap: 20px;
   }
 
   .airdrop-card {
-    border: 1px solid #ffffff00;
+    border: 1px solid #ffffff10;
     border-radius: 12px;
     padding: 16px;
-    background-color: #ffffff00;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0);
+    background-color: #ffffff0a;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     transition: 0.3s;
   }
 
@@ -61,18 +61,24 @@
     border-radius: 80px;
     font-size: 14px;
   }
+
+  /* ریسپانسیو برای موبایل */
+  @media (max-width: 992px) {
+    .airdrop-list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .airdrop-list {
+      grid-template-columns: repeat(1, 1fr);
+    }
+  }
 </style>
 
-<!-- main.js (added to the end of file or inline) -->
 <script>
   const airdrops = [
     {
-      title: "TokenX Airdrop",
-      image: "images/tokenx.png",
-      description: "Claim 100 free TokenX by signing up!",
-      link: "https://tokenx.io/airdrop"
-    },
-     {
       title: "TokenX Airdrop",
       image: "images/tokenx.png",
       description: "Claim 100 free TokenX by signing up!",
@@ -83,6 +89,30 @@
       image: "images/legend.png",
       description: "Get 50 free LGD tokens just by registering your email.",
       link: "https://legendcoin.org/join"
+    },
+    {
+      title: "SpaceDrop",
+      image: "images/space.png",
+      description: "Earn SPACE tokens by completing simple tasks!",
+      link: "https://spacetoken.io/airdrop"
+    },
+    {
+      title: "NewCoin Airdrop",
+      image: "images/newcoin.png",
+      description: "Register now and receive 25 NewCoins instantly.",
+      link: "https://newcoin.net/claim"
+    },
+    {
+      title: "MoonFi Giveaway",
+      image: "images/moonfi.png",
+      description: "Get free MoonFi tokens for joining the Telegram group.",
+      link: "https://moonfi.io/join"
+    },
+    {
+      title: "Galaxy Rewards",
+      image: "images/galaxy.png",
+      description: "Participate and win up to 500 GLX tokens!",
+      link: "https://galaxyairdrop.com"
     }
   ];
 
